@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.htstools;
 
+import static ca.qc.ircm.htstools.SetAnnotationSizeCommand.SET_ANNOTATION_SIZE_COMMAND;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.never;
@@ -45,25 +46,43 @@ public class MainServiceTest {
   @Test
   public void run_RunnerDisabled() {
     mainService = new MainService(bedTransform, false);
-    mainService.run("setAnnotationSize 1");
+    mainService.run(new String[] { "setAnnotationSize", "-s", "1" });
+    verifyZeroInteractions(bedTransform);
+  }
+
+  @Test
+  public void run_Help() {
+    mainService.run("-h");
     verifyZeroInteractions(bedTransform);
   }
 
   @Test
   public void run_SetAnnotationSize() throws Throwable {
-    mainService.run(new String[] { "setAnnotationSize", "1" });
+    mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-s", "1" });
     verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
   }
 
   @Test
-  public void run_SetAnnotationSize_LowerCase() throws Throwable {
-    mainService.run(new String[] { "setannotationsize", "1" });
+  public void run_SetAnnotationSize_Long() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-size", "1" });
+    verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
+  }
+
+  @Test
+  public void run_SetAnnotationSize_UpperCase() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND.toUpperCase(), "-size", "1" });
     verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
   }
 
   @Test
   public void run_SetAnnotationSize_InvalidSize() throws Throwable {
-    mainService.run(new String[] { "setAnnotationSize", "a" });
+    mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-size", "a" });
+    verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
+  }
+
+  @Test
+  public void run_SetAnnotationSize_NegativeSize() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-size", "-2" });
     verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
   }
 

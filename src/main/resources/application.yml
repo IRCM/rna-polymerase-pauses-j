@@ -20,6 +20,8 @@ spring:
     name: hts-tools
   main:
     banner-mode: 'off'
+  runner:
+    enabled: true
 
 logging:
   file: ${spring.application.name}.log
@@ -27,8 +29,6 @@ logging:
 ---
 spring:
   profiles: test
-  runner:
-    enabled: false
 
 logging:
   file: test.log
