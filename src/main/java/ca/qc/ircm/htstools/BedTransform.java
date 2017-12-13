@@ -33,23 +33,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Trims the end of a BED file.
+ * BED file transformations.
  */
 @Component
-public class TrimBedEnd {
+public class BedTransform {
   /**
-   * Trims the end of a BED file.
+   * Sets the size of annotations in BED file.
    *
    * @param input
    *          BED to trim
    * @param output
    *          output
    * @param parameters
-   *          trim parameters
+   *          size parameters
    * @throws IOException
    *           could not trim BED
    */
-  public void trimBedEnd(InputStream input, OutputStream output, TrimBedEndParameters parameters)
+  public void setAnnotationSize(InputStream input, OutputStream output, BedTransformParameters parameters)
       throws IOException {
     final String lineSeparator = System.getProperty("line.separator");
     try (

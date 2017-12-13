@@ -20,6 +20,6 @@ package ca.qc.ircm.htstools;
 /**
  * Parameters for BED file trimming.
  */
-public class TrimBedEndParameters {
+public class BedTransformParameters {
   public Integer sizeFromStart;
 }

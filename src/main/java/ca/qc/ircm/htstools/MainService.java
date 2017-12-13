@@ -35,7 +35,7 @@ public class MainService implements CommandLineRunner {
   private static final String RUNNER_ENABLED = "spring.runner.enabled";
   private static Logger logger = LoggerFactory.getLogger(MainService.class);
   @Inject
-  private TrimBedEnd trimBedEnd;
+  private BedTransform trimBedEnd;
   @Inject
   private Environment env;
 
@@ -60,10 +60,10 @@ public class MainService implements CommandLineRunner {
   }
 
   private void trimBedEnd(String... args) {
-    TrimBedEndParameters parameters = new TrimBedEndParameters();
+    BedTransformParameters parameters = new BedTransformParameters();
     parameters.sizeFromStart = Integer.parseInt(args[1]);
     try {
-      trimBedEnd.trimBedEnd(System.in, System.out, parameters);
+      trimBedEnd.setAnnotationSize(System.in, System.out, parameters);
     } catch (IOException e) {
       System.err.println("Could not trim BED end");
     }

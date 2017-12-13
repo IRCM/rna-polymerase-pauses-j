@@ -33,20 +33,20 @@ import java.util.stream.IntStream;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
-public class TrimBedEndTest {
+public class BedTransformTest {
   private static final int LINE_COUNT = 1000;
   private static final int MAX_CHROMOSOME = 23;
   private static final int MAX_ANNOTATION_LENGTH = 10000;
   private static final int MAX_ANNOTATION_START = Integer.MAX_VALUE - MAX_ANNOTATION_LENGTH;
   private static final int MIN_ANNOTATION_SCORE = 300;
   private static final int MAX_ANNOTATION_SCORE = 900;
-  private TrimBedEnd trimBedEnd;
+  private BedTransform bedTransform;
   private String content;
   private InputStream input;
 
   @Before
   public void beforeTest() {
-    trimBedEnd = new TrimBedEnd();
+    bedTransform = new BedTransform();
     Random random = new Random();
     content = IntStream.range(0, LINE_COUNT).mapToObj(lineNumber -> {
       int chromosome = random.nextInt(MAX_CHROMOSOME);
@@ -60,11 +60,11 @@ public class TrimBedEndTest {
   }
 
   @Test
-  public void trimBedEnd() throws Throwable {
-    TrimBedEndParameters parameters = new TrimBedEndParameters();
+  public void setAnnotationSize() throws Throwable {
+    BedTransformParameters parameters = new BedTransformParameters();
     parameters.sizeFromStart = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    trimBedEnd.trimBedEnd(input, output, parameters);
+    bedTransform.setAnnotationSize(input, output, parameters);
     String outputContent = output.toString(StandardCharsets.UTF_8.name());
     System.out.println(outputContent);
   }
