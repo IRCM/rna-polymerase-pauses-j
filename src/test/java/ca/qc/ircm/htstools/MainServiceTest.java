@@ -63,7 +63,7 @@ public class MainServiceTest {
   }
 
   @Test
-  public void run_SetAnnotationSize_Long() throws Throwable {
+  public void run_SetAnnotationSize_LongName() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-size", "1" });
     verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
   }
@@ -83,6 +83,12 @@ public class MainServiceTest {
   @Test
   public void run_SetAnnotationSize_NegativeSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-size", "-2" });
+    verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
+  }
+
+  @Test
+  public void run_SetAnnotationSize_Help() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATION_SIZE_COMMAND, "-h", "-size", "1" });
     verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
   }
 

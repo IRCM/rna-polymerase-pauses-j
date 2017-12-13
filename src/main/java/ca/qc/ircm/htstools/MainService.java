@@ -17,6 +17,8 @@
 
 package ca.qc.ircm.htstools;
 
+import static ca.qc.ircm.htstools.SetAnnotationSizeCommand.SET_ANNOTATION_SIZE_COMMAND;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.slf4j.Logger;
@@ -68,15 +70,16 @@ public class MainService implements CommandLineRunner {
     try {
       command.parse(args);
       if (command.getParsedCommand() == null || mainCommand.help) {
-        // Show help.
         command.usage();
-      } else if (command.getParsedCommand()
-          .equals(SetAnnotationSizeCommand.SET_ANNOTATION_SIZE_COMMAND)) {
-        setAnnotationSize(setAnnotationSizeCommand);
+      } else if (command.getParsedCommand().equals(SET_ANNOTATION_SIZE_COMMAND)) {
+        if (setAnnotationSizeCommand.help) {
+          command.usage(SET_ANNOTATION_SIZE_COMMAND);
+        } else {
+          setAnnotationSize(setAnnotationSizeCommand);
+        }
       }
     } catch (ParameterException e) {
-      System.err.println(e.getMessage());
-      System.err.println();
+      System.err.println(e.getMessage() + "\n");
       command.usage();
     }
   }
