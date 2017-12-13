@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.htstools;
 
-import static ca.qc.ircm.htstools.SetAnnotationSizeCommand.SET_ANNOTATION_SIZE_COMMAND;
+import static ca.qc.ircm.htstools.SetAnnotationSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -71,9 +71,9 @@ public class MainService implements CommandLineRunner {
       command.parse(args);
       if (command.getParsedCommand() == null || mainCommand.help) {
         command.usage();
-      } else if (command.getParsedCommand().equals(SET_ANNOTATION_SIZE_COMMAND)) {
+      } else if (command.getParsedCommand().equals(SET_ANNOTATIONS_SIZE_COMMAND)) {
         if (setAnnotationSizeCommand.help) {
-          command.usage(SET_ANNOTATION_SIZE_COMMAND);
+          command.usage(SET_ANNOTATIONS_SIZE_COMMAND);
         } else {
           setAnnotationSize(setAnnotationSizeCommand);
         }
