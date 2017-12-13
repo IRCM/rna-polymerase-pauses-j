@@ -37,6 +37,9 @@ public class ChunkReaderTest {
   private StringReader contentReader;
   private String content;
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() {
     Random random = new Random();

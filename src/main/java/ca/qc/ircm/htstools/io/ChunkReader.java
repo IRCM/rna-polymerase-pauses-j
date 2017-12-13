@@ -32,6 +32,13 @@ public class ChunkReader implements Closeable {
     this.chunkSize = chunkSize;
   }
 
+  /**
+   * Returns up to chunk size lines.
+   *
+   * @return lines
+   * @throws IOException
+   *           could not read lines from reader
+   */
   public List<String> readChunk() throws IOException {
     List<String> lines = new ArrayList<>();
     String line;
