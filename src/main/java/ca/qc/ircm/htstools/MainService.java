@@ -19,11 +19,12 @@ package ca.qc.ircm.htstools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -32,14 +33,18 @@ import javax.inject.Inject;
  */
 @Component
 public class MainService implements CommandLineRunner {
-  private static final String RUNNER_ENABLED = "spring.runner.enabled";
-  private static Logger logger = LoggerFactory.getLogger(MainService.class);
+  private static Logger logger = LoggerFactory.getLogger(MainServiceTest.class);
   @Inject
-  private BedTransform trimBedEnd;
-  @Inject
-  private Environment env;
+  private BedTransform bedTransform;
+  @Value("${spring.runner.enabled}")
+  private boolean runnerEnabled;
 
   protected MainService() {
+  }
+
+  protected MainService(BedTransform bedTransform, boolean runnerEnabled) {
+    this.bedTransform = bedTransform;
+    this.runnerEnabled = runnerEnabled;
   }
 
   /**
@@ -50,22 +55,21 @@ public class MainService implements CommandLineRunner {
    */
   @Override
   public void run(String... args) {
-    if (env.containsProperty(RUNNER_ENABLED)) {
-      if (!Boolean.valueOf(env.getProperty(RUNNER_ENABLED))) {
-        return;
-      }
+    if (!runnerEnabled) {
+      return;
     }
 
-    trimBedEnd(args);
+    setAnnotationSize(args);
   }
 
-  private void trimBedEnd(String... args) {
-    BedTransformParameters parameters = new BedTransformParameters();
-    parameters.sizeFromStart = Integer.parseInt(args[1]);
+  private void setAnnotationSize(String... args) {
+    logger.debug("Set annotation size with parameters {}", Arrays.toString(args));
     try {
-      trimBedEnd.setAnnotationSize(System.in, System.out, parameters);
+      bedTransform.setAnnotationSize(System.in, System.out, Integer.parseInt(args[1]));
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse annotation sizes");
     } catch (IOException e) {
-      System.err.println("Could not trim BED end");
+      System.err.println("Could not read input or write to output");
     }
   }
 }

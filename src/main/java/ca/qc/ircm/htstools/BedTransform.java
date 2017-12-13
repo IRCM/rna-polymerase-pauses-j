@@ -27,9 +27,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +39,13 @@ import java.util.stream.Collectors;
  */
 @Component
 public class BedTransform {
+  private static final String LINE_SEPARATOR = "\n";
+  private static final String COLUMN_SEPARATOR = "\t";
+  private static final String BROWSER_PATTERN = "^browser( .*)?$";
+  private static final String TRACK_PATTERN = "^track( .*)?$";
+  private static final String COMMENT = "#";
+  private static final Charset BED_CHARSET = StandardCharsets.UTF_8;
+
   /**
    * Sets the size of annotations in BED file.
    *
@@ -44,26 +53,33 @@ public class BedTransform {
    *          BED to trim
    * @param output
    *          output
-   * @param parameters
-   *          size parameters
+   * @param size
+   *          new size for annotations
    * @throws IOException
    *           could not trim BED
    */
-  public void setAnnotationSize(InputStream input, OutputStream output, BedTransformParameters parameters)
+  public void setAnnotationSize(InputStream input, OutputStream output, int size)
       throws IOException {
-    final String lineSeparator = System.getProperty("line.separator");
+    Pattern browserPattern = Pattern.compile(BROWSER_PATTERN);
+    Pattern trackPattern = Pattern.compile(TRACK_PATTERN);
     try (
-        ChunkReader reader = new ChunkReader(
-            new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)), 1000000);
-        BufferedWriter writer =
-            new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
+        ChunkReader reader =
+            new ChunkReader(new BufferedReader(new InputStreamReader(input, BED_CHARSET)), 1000000);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, BED_CHARSET))) {
       List<String> chunk;
       while (!(chunk = reader.readChunk()).isEmpty()) {
         for (String line : chunk) {
-          String[] columns = line.split("\t", -1);
-          columns[2] = String.valueOf(Long.parseLong(columns[1]) + parameters.sizeFromStart);
-          writer.write(Arrays.asList(columns).stream().collect(Collectors.joining("\t")));
-          writer.write(lineSeparator);
+          String[] columns = line.split(COLUMN_SEPARATOR, -1);
+          if (browserPattern.matcher(columns[0]).matches()
+              || trackPattern.matcher(columns[0]).matches() || columns[0].startsWith(COMMENT)) {
+            writer.write(line);
+            writer.write(LINE_SEPARATOR);
+          } else {
+            columns[2] = String.valueOf(Long.parseLong(columns[1]) + size);
+            writer.write(
+                Arrays.asList(columns).stream().collect(Collectors.joining(COLUMN_SEPARATOR)));
+            writer.write(LINE_SEPARATOR);
+          }
         }
       }
     }
