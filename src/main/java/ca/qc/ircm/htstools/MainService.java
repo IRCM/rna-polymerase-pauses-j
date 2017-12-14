@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.htstools;
 
+import static ca.qc.ircm.htstools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
 import static ca.qc.ircm.htstools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 
 import com.beust.jcommander.JCommander;
@@ -64,8 +65,9 @@ public class MainService implements CommandLineRunner {
 
     MainCommand mainCommand = new MainCommand();
     SetAnnotationsSizeCommand setAnnotationSizeCommand = new SetAnnotationsSizeCommand();
-    JCommander command =
-        JCommander.newBuilder().addObject(mainCommand).addCommand(setAnnotationSizeCommand).build();
+    MoveAnnotationsCommand moveAnnotationsCommand = new MoveAnnotationsCommand();
+    JCommander command = JCommander.newBuilder().addObject(mainCommand)
+        .addCommand(setAnnotationSizeCommand).addCommand(moveAnnotationsCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -77,6 +79,12 @@ public class MainService implements CommandLineRunner {
         } else {
           setAnnotationsSize(setAnnotationSizeCommand);
         }
+      } else if (command.getParsedCommand().equals(MOVE_ANNOTATIONS_COMMAND)) {
+        if (moveAnnotationsCommand.help) {
+          command.usage(MOVE_ANNOTATIONS_COMMAND);
+        } else {
+          moveAnnotations(moveAnnotationsCommand);
+        }
       }
     } catch (ParameterException e) {
       System.err.println(e.getMessage() + "\n");
@@ -85,9 +93,20 @@ public class MainService implements CommandLineRunner {
   }
 
   private void setAnnotationsSize(SetAnnotationsSizeCommand setAnnotationSizeCommand) {
-    logger.debug("Set annotation size with parameters {}", setAnnotationSizeCommand.size);
+    logger.debug("Set annotations size to {}", setAnnotationSizeCommand.size);
     try {
       bedTransform.setAnnotationsSize(System.in, System.out, setAnnotationSizeCommand.size);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse annotation sizes");
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+    }
+  }
+
+  private void moveAnnotations(MoveAnnotationsCommand moveAnnotationsCommand) {
+    logger.debug("Move annotations by {} bases", moveAnnotationsCommand.distance);
+    try {
+      bedTransform.moveAnnotations(System.in, System.out, moveAnnotationsCommand.distance);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse annotation sizes");
     } catch (IOException e) {

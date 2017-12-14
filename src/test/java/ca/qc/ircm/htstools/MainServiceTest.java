@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.htstools;
 
+import static ca.qc.ircm.htstools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
 import static ca.qc.ircm.htstools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -70,31 +71,67 @@ public class MainServiceTest {
 
   @Test
   public void run_SetAnnotationsSize_UpperCase() throws Throwable {
-    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND.toUpperCase(), "-size", "1" });
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND.toUpperCase(), "-s", "1" });
     verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
   }
 
   @Test
   public void run_SetAnnotationsSize_InvalidSize() throws Throwable {
-    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-size", "a" });
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "a" });
     verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
   }
 
   @Test
   public void run_SetAnnotationsSize_NegativeSize() throws Throwable {
-    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-size", "-2" });
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "-2" });
     verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
   }
 
   @Test
   public void run_SetAnnotationsSize_Help() throws Throwable {
-    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-h", "-size", "1" });
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-h", "-s", "1" });
     verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
+  }
+
+  @Test
+  public void run_MoveAnnotations() throws Throwable {
+    mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND, "-d", "20" });
+    verify(bedTransform).moveAnnotations(System.in, System.out, 20);
+  }
+
+  @Test
+  public void run_MoveAnnotations_LongName() throws Throwable {
+    mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND, "-distance", "20" });
+    verify(bedTransform).moveAnnotations(System.in, System.out, 20);
+  }
+
+  @Test
+  public void run_MoveAnnotations_UpperCase() throws Throwable {
+    mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND.toUpperCase(), "-d", "20" });
+    verify(bedTransform).moveAnnotations(System.in, System.out, 20);
+  }
+
+  @Test
+  public void run_MoveAnnotations_InvalidSize() throws Throwable {
+    mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND, "-d", "a" });
+    verify(bedTransform, never()).moveAnnotations(any(), any(), anyInt());
+  }
+
+  @Test
+  public void run_MoveAnnotations_NegativeSize() throws Throwable {
+    mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND, "-d", "-30" });
+    verify(bedTransform).moveAnnotations(System.in, System.out, -30);
+  }
+
+  @Test
+  public void run_MoveAnnotations_Help() throws Throwable {
+    mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND, "-h", "-d", "1" });
+    verify(bedTransform, never()).moveAnnotations(any(), any(), anyInt());
   }
 
   @Test
   public void run_Other() throws Throwable {
     mainService.run(new String[] { "other" });
-    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
+    verifyZeroInteractions(bedTransform);
   }
 }

@@ -56,7 +56,7 @@ public class BedTransform {
    * @param size
    *          new size for annotations
    * @throws IOException
-   *           could not trim BED
+   *           could not read or write BED
    */
   public void setAnnotationsSize(InputStream input, OutputStream output, int size)
       throws IOException {
@@ -76,6 +76,46 @@ public class BedTransform {
             writer.write(LINE_SEPARATOR);
           } else {
             columns[2] = String.valueOf(Long.parseLong(columns[1]) + size);
+            writer.write(
+                Arrays.asList(columns).stream().collect(Collectors.joining(COLUMN_SEPARATOR)));
+            writer.write(LINE_SEPARATOR);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Move annotations in BED file.
+   *
+   * @param input
+   *          BED to trim
+   * @param output
+   *          output
+   * @param distance
+   *          distance to move annotations
+   * @throws IOException
+   *           could not read or write BED
+   */
+  public void moveAnnotations(InputStream input, OutputStream output, int distance)
+      throws IOException {
+    Pattern browserPattern = Pattern.compile(BROWSER_PATTERN);
+    Pattern trackPattern = Pattern.compile(TRACK_PATTERN);
+    try (
+        ChunkReader reader =
+            new ChunkReader(new BufferedReader(new InputStreamReader(input, BED_CHARSET)), 1000000);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, BED_CHARSET))) {
+      List<String> chunk;
+      while (!(chunk = reader.readChunk()).isEmpty()) {
+        for (String line : chunk) {
+          String[] columns = line.split(COLUMN_SEPARATOR, -1);
+          if (browserPattern.matcher(columns[0]).matches()
+              || trackPattern.matcher(columns[0]).matches() || columns[0].startsWith(COMMENT)) {
+            writer.write(line);
+            writer.write(LINE_SEPARATOR);
+          } else {
+            columns[1] = String.valueOf(Long.parseLong(columns[1]) + distance);
+            columns[2] = String.valueOf(Long.parseLong(columns[2]) + distance);
             writer.write(
                 Arrays.asList(columns).stream().collect(Collectors.joining(COLUMN_SEPARATOR)));
             writer.write(LINE_SEPARATOR);
