@@ -66,9 +66,9 @@ public class BedTransformTest {
   }
 
   @Test
-  public void setAnnotationSize() throws Throwable {
+  public void setAnnotationsSize() throws Throwable {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, 3);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -87,12 +87,12 @@ public class BedTransformTest {
   }
 
   @Test
-  public void setAnnotationSize_Comments() throws Throwable {
+  public void setAnnotationsSize_Comments() throws Throwable {
     content = "#comment 1\n" + content.split("\n")[0] + "\n#comment 2\n"
         + Arrays.asList(content.split("\n")).stream().skip(1).collect(Collectors.joining("\n"));
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, 3);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -124,11 +124,11 @@ public class BedTransformTest {
   }
 
   @Test
-  public void setAnnotationSize_Track() throws Throwable {
+  public void setAnnotationsSize_Track() throws Throwable {
     content = "track name=\"my track\"\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, 3);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -148,11 +148,11 @@ public class BedTransformTest {
   }
 
   @Test
-  public void setAnnotationSize_BrowserAndTrack() throws Throwable {
+  public void setAnnotationsSize_BrowserAndTrack() throws Throwable {
     content = "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, 3);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -173,12 +173,12 @@ public class BedTransformTest {
   }
 
   @Test
-  public void setAnnotationSize_BrowserAndTrackAndComment() throws Throwable {
+  public void setAnnotationsSize_BrowserAndTrackAndComment() throws Throwable {
     content =
         "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n#comment\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, 3);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");

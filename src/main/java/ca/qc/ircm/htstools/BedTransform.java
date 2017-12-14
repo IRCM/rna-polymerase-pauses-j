@@ -58,7 +58,7 @@ public class BedTransform {
    * @throws IOException
    *           could not trim BED
    */
-  public void setAnnotationSize(InputStream input, OutputStream output, int size)
+  public void setAnnotationsSize(InputStream input, OutputStream output, int size)
       throws IOException {
     Pattern browserPattern = Pattern.compile(BROWSER_PATTERN);
     Pattern trackPattern = Pattern.compile(TRACK_PATTERN);

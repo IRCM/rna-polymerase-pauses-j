@@ -9,9 +9,9 @@ import com.beust.jcommander.validators.PositiveInteger;
  */
 @Parameters(
     separators = " =",
-    commandNames = SetAnnotationSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND,
+    commandNames = SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND,
     commandDescription = "Set annotations' size")
-public class SetAnnotationSizeCommand {
+public class SetAnnotationsSizeCommand {
   public static final String SET_ANNOTATIONS_SIZE_COMMAND = "setannotationssize";
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)

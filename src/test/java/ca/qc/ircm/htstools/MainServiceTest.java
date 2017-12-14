@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.htstools;
 
-import static ca.qc.ircm.htstools.SetAnnotationSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
+import static ca.qc.ircm.htstools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.never;
@@ -46,7 +46,7 @@ public class MainServiceTest {
   @Test
   public void run_RunnerDisabled() {
     mainService = new MainService(bedTransform, false);
-    mainService.run(new String[] { "setAnnotationSize", "-s", "1" });
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1" });
     verifyZeroInteractions(bedTransform);
   }
 
@@ -57,44 +57,44 @@ public class MainServiceTest {
   }
 
   @Test
-  public void run_SetAnnotationSize() throws Throwable {
+  public void run_SetAnnotationsSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1" });
-    verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
+    verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
   }
 
   @Test
-  public void run_SetAnnotationSize_LongName() throws Throwable {
+  public void run_SetAnnotationsSize_LongName() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-size", "1" });
-    verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
+    verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
   }
 
   @Test
-  public void run_SetAnnotationSize_UpperCase() throws Throwable {
+  public void run_SetAnnotationsSize_UpperCase() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND.toUpperCase(), "-size", "1" });
-    verify(bedTransform).setAnnotationSize(System.in, System.out, 1);
+    verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
   }
 
   @Test
-  public void run_SetAnnotationSize_InvalidSize() throws Throwable {
+  public void run_SetAnnotationsSize_InvalidSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-size", "a" });
-    verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
   }
 
   @Test
-  public void run_SetAnnotationSize_NegativeSize() throws Throwable {
+  public void run_SetAnnotationsSize_NegativeSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-size", "-2" });
-    verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
   }
 
   @Test
-  public void run_SetAnnotationSize_Help() throws Throwable {
+  public void run_SetAnnotationsSize_Help() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-h", "-size", "1" });
-    verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
   }
 
   @Test
   public void run_Other() throws Throwable {
     mainService.run(new String[] { "other" });
-    verify(bedTransform, never()).setAnnotationSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
   }
 }

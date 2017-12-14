@@ -17,7 +17,7 @@
 
 package ca.qc.ircm.htstools;
 
-import static ca.qc.ircm.htstools.SetAnnotationSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
+import static ca.qc.ircm.htstools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -63,7 +63,7 @@ public class MainService implements CommandLineRunner {
     }
 
     MainCommand mainCommand = new MainCommand();
-    SetAnnotationSizeCommand setAnnotationSizeCommand = new SetAnnotationSizeCommand();
+    SetAnnotationsSizeCommand setAnnotationSizeCommand = new SetAnnotationsSizeCommand();
     JCommander command =
         JCommander.newBuilder().addObject(mainCommand).addCommand(setAnnotationSizeCommand).build();
     command.setCaseSensitiveOptions(false);
@@ -75,7 +75,7 @@ public class MainService implements CommandLineRunner {
         if (setAnnotationSizeCommand.help) {
           command.usage(SET_ANNOTATIONS_SIZE_COMMAND);
         } else {
-          setAnnotationSize(setAnnotationSizeCommand);
+          setAnnotationsSize(setAnnotationSizeCommand);
         }
       }
     } catch (ParameterException e) {
@@ -84,10 +84,10 @@ public class MainService implements CommandLineRunner {
     }
   }
 
-  private void setAnnotationSize(SetAnnotationSizeCommand setAnnotationSizeCommand) {
+  private void setAnnotationsSize(SetAnnotationsSizeCommand setAnnotationSizeCommand) {
     logger.debug("Set annotation size with parameters {}", setAnnotationSizeCommand.size);
     try {
-      bedTransform.setAnnotationSize(System.in, System.out, setAnnotationSizeCommand.size);
+      bedTransform.setAnnotationsSize(System.in, System.out, setAnnotationSizeCommand.size);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse annotation sizes");
     } catch (IOException e) {
