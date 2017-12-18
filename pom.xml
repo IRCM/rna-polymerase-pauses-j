@@ -24,11 +24,11 @@
     <relativePath>../ircm-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>hts-tools</artifactId>
-  <name>hts-tools</name>
+  <artifactId>bed-tools</artifactId>
+  <name>bed-tools</name>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2017</inceptionYear>
-  <description>Tools for high-throughput sequencing - NGS (next-generation sequencing)</description>
+  <description>Tools for BED files</description>
   <licenses>
     <license>
       <name>GNU General Public License</name>
@@ -37,14 +37,14 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git@bitbucket.org:ircm/hts-tools.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:ircm/hts-tools.git</developerConnection>
-    <url>https://bitbucket.org/ircm/hts-tools</url>
+    <connection>scm:git:git@bitbucket.org:ircm/bed-tools.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:ircm/bed-tools.git</developerConnection>
+    <url>https://bitbucket.org/ircm/bed-tools</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>Bitbucket</system>
-    <url>https://bitbucket.org/ircm/hts-tools/issues</url>
+    <url>https://bitbucket.org/ircm/bed-tools/issues</url>
   </issueManagement>
   <properties>
     <javac.version>1.8</javac.version>

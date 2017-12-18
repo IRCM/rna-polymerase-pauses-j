@@ -1,4 +1,4 @@
-HTS-Tools
+BED-Tools
 =========
 
-Tools for high-throughput sequencing - NGS (next-generation sequencing)
+Tools for BED files
