@@ -15,10 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.htstools;
+package ca.qc.ircm.bedtools;
 
-import static ca.qc.ircm.htstools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
-import static ca.qc.ircm.htstools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
+import static ca.qc.ircm.bedtools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
+import static ca.qc.ircm.bedtools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;

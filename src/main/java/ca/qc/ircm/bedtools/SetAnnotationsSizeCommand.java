@@ -1,4 +1,4 @@
-package ca.qc.ircm.htstools;
+package ca.qc.ircm.bedtools;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;

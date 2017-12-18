@@ -15,17 +15,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.htstools;
+package ca.qc.ircm.bedtools;
 
-import static ca.qc.ircm.htstools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
-import static ca.qc.ircm.htstools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
+import static ca.qc.ircm.bedtools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
+import static ca.qc.ircm.bedtools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import ca.qc.ircm.htstools.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.bedtools.BedTransform;
+import ca.qc.ircm.bedtools.MainService;
+import ca.qc.ircm.bedtools.test.config.NonTransactionalTestAnnotations;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

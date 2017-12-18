@@ -15,21 +15,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.htstools.test.config;
+package ca.qc.ircm.bedtools;
 
-import ca.qc.ircm.htstools.Main;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target({ ElementType.TYPE })
-@Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(classes = Main.class)
-@ActiveProfiles("test")
-public @interface NonTransactionalTestAnnotations {
-
+/**
+ * Main class.
+ */
+@SpringBootApplication
+public class Main {
+  /**
+   * Starts application and run sub-program.
+   *
+   * @param args
+   *          command line arguments
+   */
+  public static void main(String[] args) {
+    SpringApplication.run(Main.class, args);
+  }
 }

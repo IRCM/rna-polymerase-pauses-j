@@ -15,9 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.htstools;
+package ca.qc.ircm.bedtools;
 
-import ca.qc.ircm.htstools.io.ChunkReader;
+import ca.qc.ircm.bedtools.io.ChunkReader;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;

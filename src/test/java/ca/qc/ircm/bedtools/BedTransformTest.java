@@ -15,11 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ca.qc.ircm.htstools;
+package ca.qc.ircm.bedtools;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.htstools.test.config.NonTransactionalTestAnnotations;
+import ca.qc.ircm.bedtools.BedTransform;
+import ca.qc.ircm.bedtools.test.config.NonTransactionalTestAnnotations;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
