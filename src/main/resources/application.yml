@@ -17,7 +17,7 @@
 
 spring:
   application:
-    name: hts-tools
+    name: bed-tools
   main:
     banner-mode: 'off'
   runner:
