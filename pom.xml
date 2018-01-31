@@ -179,6 +179,8 @@
               <exclude>**/*.txt</exclude>
               <exclude>**/*.fasta</exclude>
               <exclude>**/*.dmp</exclude>
+              <exclude>**/*.log</exclude>
+              <exclude>**/*.log.*</exclude>
             </excludes>
             <executions>
               <execution>
