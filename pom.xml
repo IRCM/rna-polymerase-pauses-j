@@ -52,7 +52,7 @@
     <spring-boot.version>1.5.10.RELEASE</spring-boot.version>
     <javax.inject.version>1</javax.inject.version>
     <jcommander.version>1.72</jcommander.version>
-    <mojolicense-maven-plugin.version>1.8</mojolicense-maven-plugin.version>
+    <mojolicense-maven-plugin.version>1.14</mojolicense-maven-plugin.version>
     <spring-boot-maven-plugin.version>${spring-boot.version}</spring-boot-maven-plugin.version>
   </properties>
   <dependencyManagement>
