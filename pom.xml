@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>bed-tools</artifactId>
   <name>bed-tools</name>
-  <version>1-SNAPSHOT</version>
+  <version>1</version>
   <inceptionYear>2017</inceptionYear>
   <description>Tools for BED files</description>
   <licenses>
