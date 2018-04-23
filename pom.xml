@@ -37,14 +37,14 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git@bitbucket.org:ircm/bed-tools.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:ircm/bed-tools.git</developerConnection>
-    <url>https://bitbucket.org/ircm/bed-tools</url>
+    <connection>scm:git:git@github.com:IRCM/bed-tools-j.git</connection>
+    <developerConnection>scm:git:git@github.com:IRCM/bed-tools-j.git</developerConnection>
+    <url>https://github.com/IRCM/bed-tools-j</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
-    <system>Bitbucket</system>
-    <url>https://bitbucket.org/ircm/bed-tools/issues</url>
+    <system>GitHub</system>
+    <url>https://github.com/IRCM/bed-tools-j/issues</url>
   </issueManagement>
   <properties>
     <javac.version>1.8</javac.version>
