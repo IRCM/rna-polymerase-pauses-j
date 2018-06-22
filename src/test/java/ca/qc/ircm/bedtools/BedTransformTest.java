@@ -19,13 +19,7 @@ package ca.qc.ircm.bedtools;
 
 import static org.junit.Assert.assertEquals;
 
-import ca.qc.ircm.bedtools.BedTransform;
 import ca.qc.ircm.bedtools.test.config.NonTransactionalTestAnnotations;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -34,6 +28,11 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @NonTransactionalTestAnnotations
@@ -54,6 +53,25 @@ public class BedTransformTest {
   @Before
   public void beforeTest() {
     bedTransform = new BedTransform();
+    bedGraphContent();
+  }
+
+  private void bedGraphContent() {
+    Random random = new Random();
+    content = IntStream.range(0, LINE_COUNT).mapToObj(lineNumber -> {
+      int chromosome = random.nextInt(MAX_CHROMOSOME);
+      int start = random.nextInt(MAX_ANNOTATION_START);
+      int end = start + random.nextInt(MAX_ANNOTATION_LENGTH);
+      String name = RandomStringUtils.randomAlphanumeric(10);
+      int score =
+          MIN_ANNOTATION_SCORE + random.nextInt(MAX_ANNOTATION_SCORE - MIN_ANNOTATION_SCORE);
+      String strand = random.nextBoolean() ? "-" : "+";
+      return chromosome + "\t" + start + "\t" + end + "\t" + name + "\t" + score + "\t" + strand;
+    }).collect(Collectors.joining("\n"));
+    input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private void bedContent() {
     Random random = new Random();
     content = IntStream.range(0, LINE_COUNT).mapToObj(lineNumber -> {
       int chromosome = random.nextInt(MAX_CHROMOSOME);
@@ -68,8 +86,10 @@ public class BedTransformTest {
 
   @Test
   public void setAnnotationsSize() throws Throwable {
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationsSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -88,12 +108,122 @@ public class BedTransformTest {
   }
 
   @Test
+  public void setAnnotationsSize_ChangeStart() throws Throwable {
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
+    parameters.changeStart = true;
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    bedTransform.setAnnotationsSize(input, output, parameters);
+    String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
+        .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
+    String[] lines = content.split("\n");
+    assertEquals(lines.length, outputLines.length);
+    for (int i = 0; i < lines.length; i++) {
+      String[] columns = lines[i].split("\t", -1);
+      String[] outputColumns = outputLines[i].split("\t", -1);
+      assertEquals(columns.length, outputColumns.length);
+      assertEquals(columns[0], outputColumns[0]);
+      assertEquals(String.valueOf(Long.parseLong(columns[2]) - 3), outputColumns[1]);
+      assertEquals(columns[2], outputColumns[2]);
+      for (int j = 3; j < columns.length; j++) {
+        assertEquals(columns[j], outputColumns[j]);
+      }
+    }
+  }
+
+  @Test
+  public void setAnnotationsSize_ReverseForNegativeStrand() throws Throwable {
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
+    parameters.reverseForNegativeStrand = true;
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    bedTransform.setAnnotationsSize(input, output, parameters);
+    String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
+        .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
+    String[] lines = content.split("\n");
+    assertEquals(lines.length, outputLines.length);
+    for (int i = 0; i < lines.length; i++) {
+      String[] columns = lines[i].split("\t", -1);
+      String[] outputColumns = outputLines[i].split("\t", -1);
+      assertEquals(columns.length, outputColumns.length);
+      assertEquals(columns[0], outputColumns[0]);
+      if (columns[5].equals("+")) {
+        assertEquals(columns[1], outputColumns[1]);
+        assertEquals(String.valueOf(Long.parseLong(columns[1]) + 3), outputColumns[2]);
+      } else {
+        assertEquals(String.valueOf(Long.parseLong(columns[2]) - 3), outputColumns[1]);
+        assertEquals(columns[2], outputColumns[2]);
+      }
+      for (int j = 3; j < columns.length; j++) {
+        assertEquals(columns[j], outputColumns[j]);
+      }
+    }
+  }
+
+  @Test
+  public void setAnnotationsSize_ReverseForNegativeStrand_NoStrand() throws Throwable {
+    bedContent();
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
+    parameters.reverseForNegativeStrand = true;
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    bedTransform.setAnnotationsSize(input, output, parameters);
+    String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
+        .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
+    String[] lines = content.split("\n");
+    assertEquals(lines.length, outputLines.length);
+    for (int i = 0; i < lines.length; i++) {
+      String[] columns = lines[i].split("\t", -1);
+      String[] outputColumns = outputLines[i].split("\t", -1);
+      assertEquals(columns.length, outputColumns.length);
+      assertEquals(columns[0], outputColumns[0]);
+      assertEquals(columns[1], outputColumns[1]);
+      assertEquals(String.valueOf(Long.parseLong(columns[1]) + 3), outputColumns[2]);
+      for (int j = 3; j < columns.length; j++) {
+        assertEquals(columns[j], outputColumns[j]);
+      }
+    }
+  }
+
+  @Test
+  public void setAnnotationsSize_ChangeStart_ReverseForNegativeStrand() throws Throwable {
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
+    parameters.changeStart = true;
+    parameters.reverseForNegativeStrand = true;
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    bedTransform.setAnnotationsSize(input, output, parameters);
+    String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
+        .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
+    String[] lines = content.split("\n");
+    assertEquals(lines.length, outputLines.length);
+    for (int i = 0; i < lines.length; i++) {
+      String[] columns = lines[i].split("\t", -1);
+      String[] outputColumns = outputLines[i].split("\t", -1);
+      assertEquals(columns.length, outputColumns.length);
+      assertEquals(columns[0], outputColumns[0]);
+      if (columns[5].equals("+")) {
+        assertEquals(String.valueOf(Long.parseLong(columns[2]) - 3), outputColumns[1]);
+        assertEquals(columns[2], outputColumns[2]);
+      } else {
+        assertEquals(columns[1], outputColumns[1]);
+        assertEquals(String.valueOf(Long.parseLong(columns[1]) + 3), outputColumns[2]);
+      }
+      for (int j = 3; j < columns.length; j++) {
+        assertEquals(columns[j], outputColumns[j]);
+      }
+    }
+  }
+
+  @Test
   public void setAnnotationsSize_Comments() throws Throwable {
     content = "#comment 1\n" + content.split("\n")[0] + "\n#comment 2\n"
         + Arrays.asList(content.split("\n")).stream().skip(1).collect(Collectors.joining("\n"));
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationsSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -128,8 +258,10 @@ public class BedTransformTest {
   public void setAnnotationsSize_Track() throws Throwable {
     content = "track name=\"my track\"\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationsSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -152,8 +284,10 @@ public class BedTransformTest {
   public void setAnnotationsSize_BrowserAndTrack() throws Throwable {
     content = "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationsSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -178,8 +312,10 @@ public class BedTransformTest {
     content =
         "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n#comment\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    SetAnnotationsSizeCommand parameters = new SetAnnotationsSizeCommand();
+    parameters.size = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.setAnnotationsSize(input, output, 3);
+    bedTransform.setAnnotationsSize(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");

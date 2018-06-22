@@ -34,9 +34,20 @@ public class SetAnnotationsSizeCommand {
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)
   public boolean help = false;
   @Parameter(
-      names = { "-s", "-size" },
+      names = { "-s", "--size" },
       description = "Annotations size",
       required = true,
       validateWith = PositiveInteger.class)
   public Integer size;
+  @Parameter(
+      names = { "-c", "--changeStart" },
+      description = "Change start position instead of end",
+      required = false)
+  public boolean changeStart;
+  @Parameter(
+      names = { "-r", "--reverseForNegativeStrand" },
+      description = "Change start position instead of end for negative strand."
+          + " If --changeStart option is use, change end instead of start",
+      required = false)
+  public boolean reverseForNegativeStrand;
 }

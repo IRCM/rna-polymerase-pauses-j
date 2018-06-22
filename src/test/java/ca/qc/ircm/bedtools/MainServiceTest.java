@@ -19,18 +19,20 @@ package ca.qc.ircm.bedtools;
 
 import static ca.qc.ircm.bedtools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
 import static ca.qc.ircm.bedtools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import ca.qc.ircm.bedtools.BedTransform;
-import ca.qc.ircm.bedtools.MainService;
 import ca.qc.ircm.bedtools.test.config.NonTransactionalTestAnnotations;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -40,6 +42,8 @@ public class MainServiceTest {
   private MainService mainService;
   @Mock
   private BedTransform bedTransform;
+  @Captor
+  private ArgumentCaptor<SetAnnotationsSizeCommand> parametersCaptor;
 
   @Before
   public void beforeTest() {
@@ -62,37 +66,90 @@ public class MainServiceTest {
   @Test
   public void run_SetAnnotationsSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1" });
-    verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(false, parametersCaptor.getValue().changeStart);
+    assertEquals(false, parametersCaptor.getValue().reverseForNegativeStrand);
   }
 
   @Test
   public void run_SetAnnotationsSize_LongName() throws Throwable {
-    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-size", "1" });
-    verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "--size", "1" });
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(false, parametersCaptor.getValue().changeStart);
+    assertEquals(false, parametersCaptor.getValue().reverseForNegativeStrand);
   }
 
   @Test
   public void run_SetAnnotationsSize_UpperCase() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND.toUpperCase(), "-s", "1" });
-    verify(bedTransform).setAnnotationsSize(System.in, System.out, 1);
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(false, parametersCaptor.getValue().changeStart);
+    assertEquals(false, parametersCaptor.getValue().reverseForNegativeStrand);
   }
 
   @Test
   public void run_SetAnnotationsSize_InvalidSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "a" });
-    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), any());
   }
 
   @Test
   public void run_SetAnnotationsSize_NegativeSize() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "-2" });
-    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), any());
+  }
+
+  @Test
+  public void run_SetAnnotationsSize_ChangeStart() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1", "-c" });
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(true, parametersCaptor.getValue().changeStart);
+    assertEquals(false, parametersCaptor.getValue().reverseForNegativeStrand);
+  }
+
+  @Test
+  public void run_SetAnnotationsSize_ChangeStart_LongName() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1", "--changeStart" });
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(true, parametersCaptor.getValue().changeStart);
+    assertEquals(false, parametersCaptor.getValue().reverseForNegativeStrand);
+  }
+
+  @Test
+  public void run_SetAnnotationsSize_ReverseForNegativeStrand() throws Throwable {
+    mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1", "-r" });
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(false, parametersCaptor.getValue().changeStart);
+    assertEquals(true, parametersCaptor.getValue().reverseForNegativeStrand);
+  }
+
+  @Test
+  public void run_SetAnnotationsSize_ReverseForNegativeStrand_LongName() throws Throwable {
+    mainService.run(
+        new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1", "--reverseForNegativeStrand" });
+    verify(bedTransform).setAnnotationsSize(eq(System.in), eq(System.out),
+        parametersCaptor.capture());
+    assertEquals((Integer) 1, parametersCaptor.getValue().size);
+    assertEquals(false, parametersCaptor.getValue().changeStart);
+    assertEquals(true, parametersCaptor.getValue().reverseForNegativeStrand);
   }
 
   @Test
   public void run_SetAnnotationsSize_Help() throws Throwable {
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-h", "-s", "1" });
-    verify(bedTransform, never()).setAnnotationsSize(any(), any(), anyInt());
+    verify(bedTransform, never()).setAnnotationsSize(any(), any(), any());
   }
 
   @Test

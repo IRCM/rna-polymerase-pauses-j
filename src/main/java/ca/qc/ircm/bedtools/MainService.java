@@ -22,15 +22,13 @@ import static ca.qc.ircm.bedtools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import java.io.IOException;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-
-import javax.inject.Inject;
 
 /**
  * Main service.
@@ -95,7 +93,7 @@ public class MainService implements CommandLineRunner {
   private void setAnnotationsSize(SetAnnotationsSizeCommand setAnnotationSizeCommand) {
     logger.debug("Set annotations size to {}", setAnnotationSizeCommand.size);
     try {
-      bedTransform.setAnnotationsSize(System.in, System.out, setAnnotationSizeCommand.size);
+      bedTransform.setAnnotationsSize(System.in, System.out, setAnnotationSizeCommand);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse annotation sizes");
     } catch (IOException e) {
