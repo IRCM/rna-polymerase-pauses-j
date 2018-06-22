@@ -114,13 +114,13 @@ public class BedTransform {
    *          BED to trim
    * @param output
    *          output
-   * @param distance
-   *          distance to move annotations
+   * @param parameters
+   *          move parameters
    * @throws IOException
    *           could not read or write BED
    */
-  public void moveAnnotations(InputStream input, OutputStream output, int distance)
-      throws IOException {
+  public void moveAnnotations(InputStream input, OutputStream output,
+      MoveAnnotationsCommand parameters) throws IOException {
     Pattern browserPattern = Pattern.compile(BROWSER_PATTERN);
     Pattern trackPattern = Pattern.compile(TRACK_PATTERN);
     try (
@@ -136,8 +136,8 @@ public class BedTransform {
             writer.write(line);
             writer.write(LINE_SEPARATOR);
           } else {
-            columns[1] = String.valueOf(Long.parseLong(columns[1]) + distance);
-            columns[2] = String.valueOf(Long.parseLong(columns[2]) + distance);
+            columns[1] = String.valueOf(Long.parseLong(columns[1]) + parameters.distance);
+            columns[2] = String.valueOf(Long.parseLong(columns[2]) + parameters.distance);
             writer.write(
                 Arrays.asList(columns).stream().collect(Collectors.joining(COLUMN_SEPARATOR)));
             writer.write(LINE_SEPARATOR);

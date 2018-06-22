@@ -338,8 +338,10 @@ public class BedTransformTest {
 
   @Test
   public void moveAnnotations() throws Throwable {
+    MoveAnnotationsCommand parameters = new MoveAnnotationsCommand();
+    parameters.distance = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.moveAnnotations(input, output, 3);
+    bedTransform.moveAnnotations(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -359,8 +361,10 @@ public class BedTransformTest {
 
   @Test
   public void moveAnnotations_NegativeDistance() throws Throwable {
+    MoveAnnotationsCommand parameters = new MoveAnnotationsCommand();
+    parameters.distance = -3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.moveAnnotations(input, output, -3);
+    bedTransform.moveAnnotations(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -383,8 +387,10 @@ public class BedTransformTest {
     content = "#comment 1\n" + content.split("\n")[0] + "\n#comment 2\n"
         + Arrays.asList(content.split("\n")).stream().skip(1).collect(Collectors.joining("\n"));
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    MoveAnnotationsCommand parameters = new MoveAnnotationsCommand();
+    parameters.distance = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.moveAnnotations(input, output, 3);
+    bedTransform.moveAnnotations(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -419,8 +425,10 @@ public class BedTransformTest {
   public void moveAnnotations_Track() throws Throwable {
     content = "track name=\"my track\"\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    MoveAnnotationsCommand parameters = new MoveAnnotationsCommand();
+    parameters.distance = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.moveAnnotations(input, output, 3);
+    bedTransform.moveAnnotations(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -443,8 +451,10 @@ public class BedTransformTest {
   public void moveAnnotations_BrowserAndTrack() throws Throwable {
     content = "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    MoveAnnotationsCommand parameters = new MoveAnnotationsCommand();
+    parameters.distance = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.moveAnnotations(input, output, 3);
+    bedTransform.moveAnnotations(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
@@ -469,8 +479,10 @@ public class BedTransformTest {
     content =
         "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n#comment\n" + content;
     input = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+    MoveAnnotationsCommand parameters = new MoveAnnotationsCommand();
+    parameters.distance = 3;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    bedTransform.moveAnnotations(input, output, 3);
+    bedTransform.moveAnnotations(input, output, parameters);
     String[] outputLines = Arrays.asList(output.toString(StandardCharsets.UTF_8.name()).split("\n"))
         .stream().filter(line -> !line.isEmpty()).toArray(count -> new String[count]);
     String[] lines = content.split("\n");
