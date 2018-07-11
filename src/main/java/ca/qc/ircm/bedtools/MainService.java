@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.bedtools;
 
+import static ca.qc.ircm.bedtools.AssesPauseSitesCommand.ASSES_PAUSE_SITES_COMMAND;
 import static ca.qc.ircm.bedtools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
 import static ca.qc.ircm.bedtools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 
@@ -38,14 +39,18 @@ public class MainService implements CommandLineRunner {
   private static Logger logger = LoggerFactory.getLogger(MainService.class);
   @Inject
   private BedTransform bedTransform;
+  @Inject
+  private AssesPauseSites assesPauseSites;
   @Value("${spring.runner.enabled}")
   private boolean runnerEnabled;
 
   protected MainService() {
   }
 
-  protected MainService(BedTransform bedTransform, boolean runnerEnabled) {
+  protected MainService(BedTransform bedTransform, AssesPauseSites assesPauseSites,
+      boolean runnerEnabled) {
     this.bedTransform = bedTransform;
+    this.assesPauseSites = assesPauseSites;
     this.runnerEnabled = runnerEnabled;
   }
 
@@ -64,8 +69,10 @@ public class MainService implements CommandLineRunner {
     MainCommand mainCommand = new MainCommand();
     SetAnnotationsSizeCommand setAnnotationSizeCommand = new SetAnnotationsSizeCommand();
     MoveAnnotationsCommand moveAnnotationsCommand = new MoveAnnotationsCommand();
-    JCommander command = JCommander.newBuilder().addObject(mainCommand)
-        .addCommand(setAnnotationSizeCommand).addCommand(moveAnnotationsCommand).build();
+    AssesPauseSitesCommand assesPauseSitesCommand = new AssesPauseSitesCommand();
+    JCommander command =
+        JCommander.newBuilder().addObject(mainCommand).addCommand(setAnnotationSizeCommand)
+            .addCommand(moveAnnotationsCommand).addCommand(assesPauseSitesCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -83,6 +90,12 @@ public class MainService implements CommandLineRunner {
         } else {
           moveAnnotations(moveAnnotationsCommand);
         }
+      } else if (command.getParsedCommand().equals(ASSES_PAUSE_SITES_COMMAND)) {
+        if (assesPauseSitesCommand.help) {
+          command.usage(MOVE_ANNOTATIONS_COMMAND);
+        } else {
+          assesPauseSites(assesPauseSitesCommand);
+        }
       }
     } catch (ParameterException e) {
       System.err.println(e.getMessage() + "\n");
@@ -90,23 +103,34 @@ public class MainService implements CommandLineRunner {
     }
   }
 
-  private void setAnnotationsSize(SetAnnotationsSizeCommand setAnnotationSizeCommand) {
-    logger.debug("Set annotations size to {}", setAnnotationSizeCommand.size);
+  private void setAnnotationsSize(SetAnnotationsSizeCommand parameters) {
+    logger.debug("Set annotations size to {}", parameters.size);
     try {
-      bedTransform.setAnnotationsSize(System.in, System.out, setAnnotationSizeCommand);
+      bedTransform.setAnnotationsSize(System.in, System.out, parameters);
     } catch (NumberFormatException e) {
-      System.err.println("Could not parse annotation sizes");
+      System.err.println("Could not parse annotation coordinates");
     } catch (IOException e) {
       System.err.println("Could not read input or write to output");
     }
   }
 
-  private void moveAnnotations(MoveAnnotationsCommand moveAnnotationsCommand) {
-    logger.debug("Move annotations by {} bases", moveAnnotationsCommand.distance);
+  private void moveAnnotations(MoveAnnotationsCommand parameters) {
+    logger.debug("Move annotations by {} bases", parameters.distance);
     try {
-      bedTransform.moveAnnotations(System.in, System.out, moveAnnotationsCommand);
+      bedTransform.moveAnnotations(System.in, System.out, parameters);
     } catch (NumberFormatException e) {
-      System.err.println("Could not parse annotation sizes");
+      System.err.println("Could not parse annotation coordinates");
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+    }
+  }
+
+  private void assesPauseSites(AssesPauseSitesCommand parameters) {
+    logger.debug("Asses RNA polymerase pause sites");
+    try {
+      assesPauseSites.assesPauseSites(System.out, parameters);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse annotation coordinates or score");
     } catch (IOException e) {
       System.err.println("Could not read input or write to output");
     }

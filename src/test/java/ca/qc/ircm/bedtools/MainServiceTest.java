@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.bedtools;
 
+import static ca.qc.ircm.bedtools.AssesPauseSitesCommand.ASSES_PAUSE_SITES_COMMAND;
 import static ca.qc.ircm.bedtools.MoveAnnotationsCommand.MOVE_ANNOTATIONS_COMMAND;
 import static ca.qc.ircm.bedtools.SetAnnotationsSizeCommand.SET_ANNOTATIONS_SIZE_COMMAND;
 import static org.junit.Assert.assertEquals;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import ca.qc.ircm.bedtools.test.config.NonTransactionalTestAnnotations;
+import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,19 +43,23 @@ public class MainServiceTest {
   private MainService mainService;
   @Mock
   private BedTransform bedTransform;
+  @Mock
+  private AssesPauseSites assesPauseSites;
   @Captor
   private ArgumentCaptor<SetAnnotationsSizeCommand> setAnnotationsSizeCommandCaptor;
   @Captor
   private ArgumentCaptor<MoveAnnotationsCommand> moveAnnotationCommandCaptor;
+  @Captor
+  private ArgumentCaptor<AssesPauseSitesCommand> assesPauseSitesCommandCaptor;
 
   @Before
   public void beforeTest() {
-    mainService = new MainService(bedTransform, true);
+    mainService = new MainService(bedTransform, assesPauseSites, true);
   }
 
   @Test
   public void run_RunnerDisabled() {
-    mainService = new MainService(bedTransform, false);
+    mainService = new MainService(bedTransform, assesPauseSites, false);
     mainService.run(new String[] { SET_ANNOTATIONS_SIZE_COMMAND, "-s", "1" });
     verifyZeroInteractions(bedTransform);
   }
@@ -195,6 +201,75 @@ public class MainServiceTest {
   public void run_MoveAnnotations_Help() throws Throwable {
     mainService.run(new String[] { MOVE_ANNOTATIONS_COMMAND, "-h", "-d", "1" });
     verify(bedTransform, never()).moveAnnotations(any(), any(), any());
+  }
+
+  @Test
+  public void run_AssesPauseSites_Help() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-h", "-i", "pom.xml" });
+    verify(assesPauseSites, never()).assesPauseSites(any(), any());
+  }
+
+  @Test
+  public void run_AssesPauseSites() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "pom.xml" });
+    verify(assesPauseSites).assesPauseSites(eq(System.out), assesPauseSitesCommandCaptor.capture());
+    assertEquals(Paths.get("pom.xml"), assesPauseSitesCommandCaptor.getValue().input);
+    assertEquals(200, assesPauseSitesCommandCaptor.getValue().window);
+    assertEquals(3, assesPauseSitesCommandCaptor.getValue().standardDeviationFactor, 0.00001);
+  }
+
+  @Test
+  public void run_AssesPauseSites_MissingInput() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND });
+    verify(assesPauseSites, never()).assesPauseSites(any(), any());
+  }
+
+  @Test
+  public void run_AssesPauseSites_InputNotExists() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "notexists.txt" });
+    verify(assesPauseSites, never()).assesPauseSites(any(), any());
+  }
+
+  @Test
+  public void run_AssesPauseSites_Window() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "pom.xml", "-w", "300" });
+    verify(assesPauseSites).assesPauseSites(eq(System.out), assesPauseSitesCommandCaptor.capture());
+    assertEquals(Paths.get("pom.xml"), assesPauseSitesCommandCaptor.getValue().input);
+    assertEquals(300, assesPauseSitesCommandCaptor.getValue().window);
+    assertEquals(3, assesPauseSitesCommandCaptor.getValue().standardDeviationFactor, 0.00001);
+  }
+
+  @Test
+  public void run_AssesPauseSites_Window_LongName() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "pom.xml", "--window", "300" });
+    verify(assesPauseSites).assesPauseSites(eq(System.out), assesPauseSitesCommandCaptor.capture());
+    assertEquals(Paths.get("pom.xml"), assesPauseSitesCommandCaptor.getValue().input);
+    assertEquals(300, assesPauseSitesCommandCaptor.getValue().window);
+    assertEquals(3, assesPauseSitesCommandCaptor.getValue().standardDeviationFactor, 0.00001);
+  }
+
+  @Test
+  public void run_AssesPauseSites_NegativeWindow() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "pom.xml", "-w", "-200" });
+    verify(assesPauseSites, never()).assesPauseSites(any(), any());
+  }
+
+  @Test
+  public void run_AssesPauseSites_StandardDeviationFactor() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "pom.xml", "-std", "2.3" });
+    verify(assesPauseSites).assesPauseSites(eq(System.out), assesPauseSitesCommandCaptor.capture());
+    assertEquals(Paths.get("pom.xml"), assesPauseSitesCommandCaptor.getValue().input);
+    assertEquals(200, assesPauseSitesCommandCaptor.getValue().window);
+    assertEquals(2.3, assesPauseSitesCommandCaptor.getValue().standardDeviationFactor, 0.00001);
+  }
+
+  @Test
+  public void run_AssesPauseSites_NegativeStandardDeviationFactor() throws Throwable {
+    mainService.run(new String[] { ASSES_PAUSE_SITES_COMMAND, "-i", "pom.xml", "-std", "-3" });
+    verify(assesPauseSites).assesPauseSites(eq(System.out), assesPauseSitesCommandCaptor.capture());
+    assertEquals(Paths.get("pom.xml"), assesPauseSitesCommandCaptor.getValue().input);
+    assertEquals(200, assesPauseSitesCommandCaptor.getValue().window);
+    assertEquals(-3, assesPauseSitesCommandCaptor.getValue().standardDeviationFactor, 0.00001);
   }
 
   @Test
