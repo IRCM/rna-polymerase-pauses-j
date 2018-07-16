@@ -66,6 +66,9 @@ public class WigConverterTest {
   private String content;
   private Path chromosomeSizes = Paths.get("chromosomeSizes.txt");
 
+  /**
+   * Before test.
+   */
   @Before
   public void beforeTest() throws Throwable {
     wigConverter = new WigConverter(chromosomeSizesParser);
