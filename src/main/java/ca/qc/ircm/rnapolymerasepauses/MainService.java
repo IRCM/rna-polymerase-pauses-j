@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
+import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 
 import com.beust.jcommander.JCommander;
@@ -37,14 +38,18 @@ public class MainService implements CommandLineRunner {
   private static Logger logger = LoggerFactory.getLogger(MainService.class);
   @Inject
   private WigConverter wigConverter;
+  @Inject
+  private PausesConverter pausesConverter;
   @Value("${spring.runner.enabled}")
   private boolean runnerEnabled;
 
   protected MainService() {
   }
 
-  protected MainService(WigConverter wigConverter, boolean runnerEnabled) {
+  protected MainService(WigConverter wigConverter, PausesConverter pausesConverter,
+      boolean runnerEnabled) {
     this.wigConverter = wigConverter;
+    this.pausesConverter = pausesConverter;
     this.runnerEnabled = runnerEnabled;
   }
 
@@ -62,8 +67,9 @@ public class MainService implements CommandLineRunner {
 
     MainCommand mainCommand = new MainCommand();
     WigToTrackCommand wigToTrackCommand = new WigToTrackCommand();
-    JCommander command =
-        JCommander.newBuilder().addObject(mainCommand).addCommand(wigToTrackCommand).build();
+    PausesToTabsCommand pausesToTabsCommand = new PausesToTabsCommand();
+    JCommander command = JCommander.newBuilder().addObject(mainCommand)
+        .addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -74,6 +80,12 @@ public class MainService implements CommandLineRunner {
           command.usage(WIG_TO_TRACK_COMMAND);
         } else {
           wigToTrack(wigToTrackCommand);
+        }
+      } else if (command.getParsedCommand().equals(PAUSES_TO_TABS_COMMAND)) {
+        if (pausesToTabsCommand.help) {
+          command.usage(PAUSES_TO_TABS_COMMAND);
+        } else {
+          pausesToTabs(pausesToTabsCommand);
         }
       }
     } catch (ParameterException e) {
@@ -86,6 +98,19 @@ public class MainService implements CommandLineRunner {
     logger.debug("Converts WIG to track");
     try {
       wigConverter.wigToTrack(System.in, System.out, command);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse WIG file");
+      e.printStackTrace();
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+      e.printStackTrace();
+    }
+  }
+
+  private void pausesToTabs(PausesToTabsCommand command) {
+    logger.debug("Converts pauses to tab delimited");
+    try {
+      pausesConverter.pausesToTabs(System.in, System.out, command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse WIG file");
       e.printStackTrace();

@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
+import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -44,27 +45,33 @@ public class MainServiceTest {
   private MainService mainService;
   @Mock
   private WigConverter wigConverter;
+  @Mock
+  private PausesConverter pausesConverter;
   @Captor
   private ArgumentCaptor<WigToTrackCommand> wigToTrackCommandCaptor;
+  @Captor
+  private ArgumentCaptor<PausesToTabsCommand> pausesToTabsCommandCaptor;
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
   public void beforeTest() {
-    mainService = new MainService(wigConverter, true);
+    mainService = new MainService(wigConverter, pausesConverter, true);
   }
 
   @Test
   public void run_RunnerDisabled() {
-    mainService = new MainService(wigConverter, false);
+    mainService = new MainService(wigConverter, pausesConverter, false);
     mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-s", "1" });
     verifyZeroInteractions(wigConverter);
+    verifyZeroInteractions(pausesConverter);
   }
 
   @Test
   public void run_Help() {
     mainService.run("-h");
     verifyZeroInteractions(wigConverter);
+    verifyZeroInteractions(pausesConverter);
   }
 
   @Test
@@ -102,8 +109,22 @@ public class MainServiceTest {
   }
 
   @Test
+  public void run_PausesToTabs() throws Throwable {
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND });
+    verify(pausesConverter).pausesToTabs(eq(System.in), eq(System.out),
+        pausesToTabsCommandCaptor.capture());
+  }
+
+  @Test
+  public void run_PausesToTabs_Help() throws Throwable {
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-h" });
+    verify(pausesConverter, never()).pausesToTabs(any(), any(), any());
+  }
+
+  @Test
   public void run_Other() throws Throwable {
     mainService.run(new String[] { "other" });
     verifyZeroInteractions(wigConverter);
+    verifyZeroInteractions(pausesConverter);
   }
 }
