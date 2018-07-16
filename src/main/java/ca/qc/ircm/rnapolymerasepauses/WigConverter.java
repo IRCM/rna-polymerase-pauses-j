@@ -60,13 +60,13 @@ public class WigConverter {
    * Converts WIG file to track file.
    *
    * @param input
-   *          BED to trim
+   *          WIG file
    * @param output
    *          output
    * @param parameters
-   *          size change parameters
+   *          parameters
    * @throws IOException
-   *           could not read or write BED
+   *           could not read WIG or write to output
    */
   public void wigToTrack(InputStream input, OutputStream output, WigToTrackCommand parameters)
       throws IOException {
