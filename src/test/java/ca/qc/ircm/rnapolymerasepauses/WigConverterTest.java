@@ -51,7 +51,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class WigConverterTest {
   private static final String LINE_SEPARATOR = "\n";
   private static final int CHROMOSOME_COUNT = 21;
-  private static final int CHROMOSOME_MAX_LENGTH = 100;
+  private static final int CHROMOSOME_MAX_LENGTH = 10000;
   private static final double NO_SCORE_RATIO = 0.75;
   private static final String SEPARATOR = "\t";
   private static final Charset WIG_CHARSET = StandardCharsets.UTF_8;

@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
+import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 import static org.junit.Assert.assertEquals;
@@ -44,9 +45,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MainServiceTest {
   private MainService mainService;
   @Mock
+  private BedConverter bedConverter;
+  @Mock
   private WigConverter wigConverter;
   @Mock
   private PausesConverter pausesConverter;
+  @Captor
+  private ArgumentCaptor<BedToTrackCommand> bedToTrackCommandCaptor;
   @Captor
   private ArgumentCaptor<WigToTrackCommand> wigToTrackCommandCaptor;
   @Captor
@@ -56,13 +61,14 @@ public class MainServiceTest {
 
   @Before
   public void beforeTest() {
-    mainService = new MainService(wigConverter, pausesConverter, true);
+    mainService = new MainService(bedConverter, wigConverter, pausesConverter, true);
   }
 
   @Test
   public void run_RunnerDisabled() {
-    mainService = new MainService(wigConverter, pausesConverter, false);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-s", "1" });
+    mainService = new MainService(bedConverter, wigConverter, pausesConverter, false);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", "1" });
+    verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
   }
@@ -70,8 +76,43 @@ public class MainServiceTest {
   @Test
   public void run_Help() {
     mainService.run("-h");
+    verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+  }
+
+  @Test
+  public void run_BedToTrack() throws Throwable {
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(eq(System.in), eq(System.out),
+        bedToTrackCommandCaptor.capture());
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_BedToTrack_ChromosomeSizesLongName() throws Throwable {
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService
+        .run(new String[] { BED_TO_TRACK_COMMAND, "--chromoseSizes", chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(eq(System.in), eq(System.out),
+        bedToTrackCommandCaptor.capture());
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_BedToTrack_ChromosomeSizesNotExists() throws Throwable {
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
+    verify(bedConverter, never()).bedToTrack(any(), any(), any());
+  }
+
+  @Test
+  public void run_BedToTrack_Help() throws Throwable {
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-h" });
+    verify(bedConverter, never()).bedToTrack(any(), any(), any());
   }
 
   @Test
@@ -124,6 +165,7 @@ public class MainServiceTest {
   @Test
   public void run_Other() throws Throwable {
     mainService.run(new String[] { "other" });
+    verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
   }

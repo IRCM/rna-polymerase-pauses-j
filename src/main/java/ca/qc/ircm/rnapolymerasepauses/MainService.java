@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
+import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 
@@ -37,6 +38,8 @@ import org.springframework.stereotype.Component;
 public class MainService implements CommandLineRunner {
   private static Logger logger = LoggerFactory.getLogger(MainService.class);
   @Inject
+  private BedConverter bedConverter;
+  @Inject
   private WigConverter wigConverter;
   @Inject
   private PausesConverter pausesConverter;
@@ -46,8 +49,9 @@ public class MainService implements CommandLineRunner {
   protected MainService() {
   }
 
-  protected MainService(WigConverter wigConverter, PausesConverter pausesConverter,
-      boolean runnerEnabled) {
+  protected MainService(BedConverter bedConverter, WigConverter wigConverter,
+      PausesConverter pausesConverter, boolean runnerEnabled) {
+    this.bedConverter = bedConverter;
     this.wigConverter = wigConverter;
     this.pausesConverter = pausesConverter;
     this.runnerEnabled = runnerEnabled;
@@ -66,15 +70,23 @@ public class MainService implements CommandLineRunner {
     }
 
     MainCommand mainCommand = new MainCommand();
+    BedToTrackCommand bedToTrackCommand = new BedToTrackCommand();
     WigToTrackCommand wigToTrackCommand = new WigToTrackCommand();
     PausesToTabsCommand pausesToTabsCommand = new PausesToTabsCommand();
-    JCommander command = JCommander.newBuilder().addObject(mainCommand)
-        .addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand).build();
+    JCommander command =
+        JCommander.newBuilder().addObject(mainCommand).addCommand(bedToTrackCommand)
+            .addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
       if (command.getParsedCommand() == null || mainCommand.help) {
         command.usage();
+      } else if (command.getParsedCommand().equals(BED_TO_TRACK_COMMAND)) {
+        if (bedToTrackCommand.help) {
+          command.usage(BED_TO_TRACK_COMMAND);
+        } else {
+          bedToTrack(bedToTrackCommand);
+        }
       } else if (command.getParsedCommand().equals(WIG_TO_TRACK_COMMAND)) {
         if (wigToTrackCommand.help) {
           command.usage(WIG_TO_TRACK_COMMAND);
@@ -91,6 +103,19 @@ public class MainService implements CommandLineRunner {
     } catch (ParameterException e) {
       System.err.println(e.getMessage() + "\n");
       command.usage();
+    }
+  }
+
+  private void bedToTrack(BedToTrackCommand command) {
+    logger.debug("Converts BED to track");
+    try {
+      bedConverter.bedToTrack(System.in, System.out, command);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse BED file");
+      e.printStackTrace();
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+      e.printStackTrace();
     }
   }
 
