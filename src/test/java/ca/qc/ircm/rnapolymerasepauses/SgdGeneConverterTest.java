@@ -151,6 +151,22 @@ public class SgdGeneConverterTest {
     int lineNumber = 0;
     for (String chromosome : genes.keySet()) {
       for (Gene gene : genes.get(chromosome)) {
+        if (gene.strand.equals("-")) {
+          continue;
+        }
+        String[] columns = lines[lineNumber].split(SEPARATOR, -1);
+        assertEquals(chromosome, columns[0]);
+        assertEquals(gene.txStart, Long.parseLong(columns[1]));
+        assertEquals(gene.txEnd, Long.parseLong(columns[2]));
+        assertEquals(gene.strand, columns[3]);
+        assertEquals(gene.name, columns[4]);
+      }
+    }
+    for (String chromosome : genes.keySet()) {
+      for (Gene gene : genes.get(chromosome)) {
+        if (gene.strand.equals("+")) {
+          continue;
+        }
         String[] columns = lines[lineNumber].split(SEPARATOR, -1);
         assertEquals(chromosome, columns[0]);
         assertEquals(gene.txStart, Long.parseLong(columns[1]));
