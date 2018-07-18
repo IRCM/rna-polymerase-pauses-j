@@ -79,7 +79,7 @@ public class WigConverter {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, WIG_CHARSET));
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, WIG_CHARSET))) {
       String chromosome;
-      long position = 1;
+      long position = 0;
       long size = 0;
       String line;
       while ((line = reader.readLine()) != null) {
@@ -87,7 +87,7 @@ public class WigConverter {
             || line.startsWith(COMMENT)) {
           continue;
         } else if (variableStepPattern.matcher(line).matches()) {
-          while (position <= size) {
+          while (position < size) {
             writer.write("0");
             writer.write(LINE_SEPARATOR);
             position++;
@@ -103,7 +103,7 @@ public class WigConverter {
             }
             size = sizes.get(chromosome);
           }
-          position = 1;
+          position = 0;
         } else {
           String[] columns = line.split(COLUMN_SEPARATOR, -1);
           if (columns.length != 2) {
@@ -120,7 +120,7 @@ public class WigConverter {
           position++;
         }
       }
-      while (position <= size) {
+      while (position < size) {
         writer.write("0");
         writer.write(LINE_SEPARATOR);
         position++;

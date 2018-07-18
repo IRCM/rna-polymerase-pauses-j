@@ -80,7 +80,7 @@ public class WigConverterTest {
     scores = new HashMap<>();
     sizes.forEach((chromosome, size) -> {
       scores.put(chromosome, new HashMap<>());
-      LongStream.rangeClosed(1, size).filter(position -> random.nextDouble() > NO_SCORE_RATIO)
+      LongStream.range(0, size).filter(position -> random.nextDouble() > NO_SCORE_RATIO)
           .forEach(position -> {
             scores.get(chromosome).put(position, random.nextDouble());
           });
@@ -94,8 +94,8 @@ public class WigConverterTest {
     List<String> lines = new ArrayList<>();
     sizes.forEach((chromosome, size) -> {
       lines.add("variableStep chrom=" + chromosome);
-      LongStream.rangeClosed(1, size)
-          .filter(position -> scores.get(chromosome).containsKey(position)).forEach(position -> {
+      LongStream.range(0, size).filter(position -> scores.get(chromosome).containsKey(position))
+          .forEach(position -> {
             lines.add(position + SEPARATOR + scores.get(chromosome).get(position));
           });
     });
@@ -114,7 +114,7 @@ public class WigConverterTest {
     int lineNumber = 0;
     for (String chromosome : sizes.keySet()) {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
-      for (long position = 1; position <= sizes.get(chromosome); position++) {
+      for (long position = 0; position < sizes.get(chromosome); position++) {
         double score =
             scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
                 : 0.0;
@@ -139,9 +139,9 @@ public class WigConverterTest {
     for (String chromosome : sizes.keySet()) {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
       for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score = scores.get(chromosome).containsKey(position + 1)
-            ? scores.get(chromosome).get(position + 1)
-            : 0.0;
+        double score =
+            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
+                : 0.0;
         assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
             DELTA);
       }
@@ -162,9 +162,9 @@ public class WigConverterTest {
     for (String chromosome : sizes.keySet()) {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
       for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score = scores.get(chromosome).containsKey(position + 1)
-            ? scores.get(chromosome).get(position + 1)
-            : 0.0;
+        double score =
+            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
+                : 0.0;
         assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
             DELTA);
       }
@@ -185,9 +185,9 @@ public class WigConverterTest {
     for (String chromosome : sizes.keySet()) {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
       for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score = scores.get(chromosome).containsKey(position + 1)
-            ? scores.get(chromosome).get(position + 1)
-            : 0.0;
+        double score =
+            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
+                : 0.0;
         assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
             DELTA);
       }
@@ -209,9 +209,9 @@ public class WigConverterTest {
     for (String chromosome : sizes.keySet()) {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
       for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score = scores.get(chromosome).containsKey(position + 1)
-            ? scores.get(chromosome).get(position + 1)
-            : 0.0;
+        double score =
+            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
+                : 0.0;
         assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
             DELTA);
       }

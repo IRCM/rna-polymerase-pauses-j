@@ -138,7 +138,7 @@ public class BedConverterTest {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
       List<BedData> datas = this.datas.get(chromosome);
       BedData data = datas.get(dataIndex++);
-      for (long position = 1; position <= sizes.get(chromosome); position++) {
+      for (long position = 0; position < sizes.get(chromosome); position++) {
         while (data != null && position >= data.end) {
           data = dataIndex < datas.size() ? datas.get(dataIndex++) : null;
         }

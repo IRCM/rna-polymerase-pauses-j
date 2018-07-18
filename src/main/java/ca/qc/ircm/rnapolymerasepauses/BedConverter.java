@@ -75,7 +75,7 @@ public class BedConverter {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, CHARSET));
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, CHARSET))) {
       String chromosome = "not a valid chromosome";
-      long position = 1;
+      long position = 0;
       long size = 0;
       String line;
       while ((line = reader.readLine()) != null) {
@@ -88,13 +88,13 @@ public class BedConverter {
           throw new IllegalStateException("BED file does not contain score for all lines");
         }
         if (!chromosome.equals(columns[0])) {
-          while (position <= size) {
+          while (position < size) {
             writer.write("0");
             writer.write(LINE_SEPARATOR);
             position++;
           }
           chromosome = columns[0];
-          position = 1;
+          position = 0;
           writer.write(String.format(CHROMOSOME_PATTERN, chromosome));
           writer.write(LINE_SEPARATOR);
           if (!sizes.containsKey(chromosome)) {
@@ -122,7 +122,7 @@ public class BedConverter {
           position++;
         }
       }
-      while (position <= size) {
+      while (position < size) {
         writer.write("0");
         writer.write(LINE_SEPARATOR);
         position++;
