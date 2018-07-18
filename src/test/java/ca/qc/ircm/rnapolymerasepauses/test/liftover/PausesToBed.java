@@ -2,6 +2,7 @@ package ca.qc.ircm.rnapolymerasepauses.test.liftover;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,8 +18,11 @@ public class PausesToBed {
    */
   public static void main(String[] args) throws Throwable {
     Path home = Paths.get(System.getProperty("user.home")).resolve("Downloads");
-    Path input = home.resolve("100225t_IP_DST1.txt");
-    Path output = home.resolve("100225t_IP_DST1.bed");
+    convert(home.resolve("091113t_IP_WT.txt"), home.resolve("091113t_IP_WT.bed"));
+    convert(home.resolve("100225t_IP_DST1.txt"), home.resolve("100225t_IP_DST1.bed"));
+  }
+
+  private static void convert(Path input, Path output) throws IOException {
     try (BufferedReader reader = Files.newBufferedReader(input);
         BufferedWriter writer = Files.newBufferedWriter(output)) {
       String line;

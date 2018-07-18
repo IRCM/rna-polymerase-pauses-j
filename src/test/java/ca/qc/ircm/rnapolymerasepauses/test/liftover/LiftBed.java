@@ -2,9 +2,12 @@ package ca.qc.ircm.rnapolymerasepauses.test.liftover;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LiftBed {
   /**
@@ -17,8 +20,15 @@ public class LiftBed {
    */
   public static void main(String[] args) throws Throwable {
     Path home = Paths.get(System.getProperty("user.home")).resolve("Downloads");
-    Path input = home.resolve("091113t_IP_WT-lift.bed");
-    Path output = home.resolve("091113t_IP_WT-lift2.bed");
+    List<Path> inputs = Files.list(home).filter(p -> p.toString().endsWith("-ori.bed"))
+        .collect(Collectors.toList());
+    for (Path input : inputs) {
+      String outputFilename = input.getFileName().toString().replace("-ori.bed", "-2lift.bed");
+      lift(input, input.resolveSibling(outputFilename));
+    }
+  }
+
+  private static void lift(Path input, Path output) throws IOException {
     try (BufferedReader reader = Files.newBufferedReader(input);
         BufferedWriter writer = Files.newBufferedWriter(output)) {
       String line;
@@ -30,14 +40,12 @@ public class LiftBed {
           if (start > 126895) {
             start--;
             end--;
-            System.err.println("Increase " + columns[0] + ":" + columns[1] + "-" + columns[2]);
           } else if (start <= 126895 && end > 126895) {
             end--;
-            System.err.println("Increase end " + columns[0] + ":" + columns[1] + "-" + columns[2]);
           }
           if (start == end) {
-            System.err
-                .println("Skipping unmapped " + columns[0] + ":" + columns[1] + "-" + columns[2]);
+            System.err.println("Skipping unmapped " + columns[0] + ":" + columns[1] + "-"
+                + columns[2] + " of input " + input);
             continue;
           } else {
             writer.write(columns[0]);

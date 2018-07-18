@@ -17,8 +17,11 @@ public class BedToPauses {
    */
   public static void main(String[] args) throws Throwable {
     Path home = Paths.get(System.getProperty("user.home")).resolve("Downloads");
-    Path input = home.resolve("091113t_IP_WT.txt");
-    Path output = home.resolve("091113t_IP_WT-lift.txt");
+    convert(home.resolve("091113t_IP_WT-lift.bed"), home.resolve("091113t_IP_WT-lift.txt"));
+    convert(home.resolve("100225t_IP_DST1-lift.bed"), home.resolve("100225t_IP_DST1-lift.txt"));
+  }
+
+  private static void convert(Path input, Path output) throws Throwable {
     try (BufferedReader reader = Files.newBufferedReader(input);
         BufferedWriter writer = Files.newBufferedWriter(output)) {
       String line;
