@@ -28,7 +28,7 @@ import com.beust.jcommander.Parameters;
     commandNames = SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND,
     commandDescription = "Converts SGD gene file from UCSC to TSS file")
 public class SgdGeneToTssCommand {
-  public static final String SGD_GENE_TO_TSS_COMMAND = "sgdGene";
+  public static final String SGD_GENE_TO_TSS_COMMAND = "sgdgene2tss";
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)
   public boolean help = false;
