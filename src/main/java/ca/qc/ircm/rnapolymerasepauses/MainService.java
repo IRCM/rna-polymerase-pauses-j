@@ -19,6 +19,7 @@ package ca.qc.ircm.rnapolymerasepauses;
 
 import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
+import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 
 import com.beust.jcommander.JCommander;
@@ -43,6 +44,8 @@ public class MainService implements CommandLineRunner {
   private WigConverter wigConverter;
   @Inject
   private PausesConverter pausesConverter;
+  @Inject
+  private SgdGeneConverter sgdGeneConverter;
   @Value("${spring.runner.enabled}")
   private boolean runnerEnabled;
 
@@ -50,10 +53,11 @@ public class MainService implements CommandLineRunner {
   }
 
   protected MainService(BedConverter bedConverter, WigConverter wigConverter,
-      PausesConverter pausesConverter, boolean runnerEnabled) {
+      PausesConverter pausesConverter, SgdGeneConverter sgdGeneConverter, boolean runnerEnabled) {
     this.bedConverter = bedConverter;
     this.wigConverter = wigConverter;
     this.pausesConverter = pausesConverter;
+    this.sgdGeneConverter = sgdGeneConverter;
     this.runnerEnabled = runnerEnabled;
   }
 
@@ -73,9 +77,10 @@ public class MainService implements CommandLineRunner {
     BedToTrackCommand bedToTrackCommand = new BedToTrackCommand();
     WigToTrackCommand wigToTrackCommand = new WigToTrackCommand();
     PausesToTabsCommand pausesToTabsCommand = new PausesToTabsCommand();
-    JCommander command =
-        JCommander.newBuilder().addObject(mainCommand).addCommand(bedToTrackCommand)
-            .addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand).build();
+    SgdGeneToTssCommand sgdGeneToTssCommand = new SgdGeneToTssCommand();
+    JCommander command = JCommander.newBuilder().addObject(mainCommand)
+        .addCommand(bedToTrackCommand).addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand)
+        .addCommand(sgdGeneToTssCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -98,6 +103,12 @@ public class MainService implements CommandLineRunner {
           command.usage(PAUSES_TO_TABS_COMMAND);
         } else {
           pausesToTabs(pausesToTabsCommand);
+        }
+      } else if (command.getParsedCommand().equals(SGD_GENE_TO_TSS_COMMAND)) {
+        if (sgdGeneToTssCommand.help) {
+          command.usage(SGD_GENE_TO_TSS_COMMAND);
+        } else {
+          sgdGeneToTss(sgdGeneToTssCommand);
         }
       }
     } catch (ParameterException e) {
@@ -137,7 +148,20 @@ public class MainService implements CommandLineRunner {
     try {
       pausesConverter.pausesToTabs(System.in, System.out, command);
     } catch (NumberFormatException e) {
-      System.err.println("Could not parse WIG file");
+      System.err.println("Could not parse pauses file");
+      e.printStackTrace();
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+      e.printStackTrace();
+    }
+  }
+
+  private void sgdGeneToTss(SgdGeneToTssCommand command) {
+    logger.debug("Converts SGD gene to TSS");
+    try {
+      sgdGeneConverter.sgdGeneToTss(System.in, System.out, command);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse SGD gene file");
       e.printStackTrace();
     } catch (IOException e) {
       System.err.println("Could not read input or write to output");

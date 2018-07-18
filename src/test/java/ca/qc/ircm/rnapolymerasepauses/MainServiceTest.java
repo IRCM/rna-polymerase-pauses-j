@@ -19,6 +19,7 @@ package ca.qc.ircm.rnapolymerasepauses;
 
 import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
+import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -50,27 +51,34 @@ public class MainServiceTest {
   private WigConverter wigConverter;
   @Mock
   private PausesConverter pausesConverter;
+  @Mock
+  private SgdGeneConverter sgdGeneConverter;
   @Captor
   private ArgumentCaptor<BedToTrackCommand> bedToTrackCommandCaptor;
   @Captor
   private ArgumentCaptor<WigToTrackCommand> wigToTrackCommandCaptor;
   @Captor
   private ArgumentCaptor<PausesToTabsCommand> pausesToTabsCommandCaptor;
+  @Captor
+  private ArgumentCaptor<SgdGeneToTssCommand> sgdGeneToTssCommandCaptor;
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
   public void beforeTest() {
-    mainService = new MainService(bedConverter, wigConverter, pausesConverter, true);
+    mainService =
+        new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter, true);
   }
 
   @Test
   public void run_RunnerDisabled() {
-    mainService = new MainService(bedConverter, wigConverter, pausesConverter, false);
+    mainService =
+        new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter, false);
     mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", "1" });
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+    verifyZeroInteractions(sgdGeneConverter);
   }
 
   @Test
@@ -79,6 +87,7 @@ public class MainServiceTest {
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+    verifyZeroInteractions(sgdGeneConverter);
   }
 
   @Test
@@ -163,10 +172,24 @@ public class MainServiceTest {
   }
 
   @Test
+  public void run_SgdGeneToTss() throws Throwable {
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND });
+    verify(sgdGeneConverter).sgdGeneToTss(eq(System.in), eq(System.out),
+        sgdGeneToTssCommandCaptor.capture());
+  }
+
+  @Test
+  public void run_SgdGeneToTss_Help() throws Throwable {
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-h" });
+    verify(sgdGeneConverter, never()).sgdGeneToTss(any(), any(), any());
+  }
+
+  @Test
   public void run_Other() throws Throwable {
     mainService.run(new String[] { "other" });
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+    verifyZeroInteractions(sgdGeneConverter);
   }
 }
