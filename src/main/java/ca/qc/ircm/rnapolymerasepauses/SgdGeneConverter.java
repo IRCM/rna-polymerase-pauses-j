@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Component;
 public class SgdGeneConverter {
   private static final String LINE_SEPARATOR = "\n";
   private static final String COLUMN_SEPARATOR = "\t";
+  private static final String NEGATIVE_STRAND = "-";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   protected SgdGeneConverter() {
@@ -66,20 +69,23 @@ public class SgdGeneConverter {
       writer.write(COLUMN_SEPARATOR);
       writer.write("ANNO_TAG");
       writer.write(LINE_SEPARATOR);
+      StringWriter negativeStrandWriter = new StringWriter();
       String line;
       while ((line = reader.readLine()) != null) {
         String[] columns = line.split(COLUMN_SEPARATOR, -1);
-        writer.write(columns[2]);
-        writer.write(COLUMN_SEPARATOR);
-        writer.write(columns[4]);
-        writer.write(COLUMN_SEPARATOR);
-        writer.write(columns[5]);
-        writer.write(COLUMN_SEPARATOR);
-        writer.write(columns[3]);
-        writer.write(COLUMN_SEPARATOR);
-        writer.write(columns[1]);
-        writer.write(LINE_SEPARATOR);
+        Writer strandWriter = columns[3].equals(NEGATIVE_STRAND) ? negativeStrandWriter : writer;
+        strandWriter.write(columns[2]);
+        strandWriter.write(COLUMN_SEPARATOR);
+        strandWriter.write(columns[4]);
+        strandWriter.write(COLUMN_SEPARATOR);
+        strandWriter.write(columns[5]);
+        strandWriter.write(COLUMN_SEPARATOR);
+        strandWriter.write(columns[3]);
+        strandWriter.write(COLUMN_SEPARATOR);
+        strandWriter.write(columns[1]);
+        strandWriter.write(LINE_SEPARATOR);
       }
+      writer.write(negativeStrandWriter.toString());
     }
   }
 }

@@ -82,12 +82,12 @@ public class SgdGeneConverterTest {
         gene.id = id++;
         gene.name = RandomStringUtils.randomAlphanumeric(GENE_NAME_SIZE);
         gene.chromosome = chromosome;
-        gene.strand = random.nextInt(1) == 0 ? "+" : "-";
+        gene.strand = random.nextInt(2) == 0 ? "+" : "-";
         gene.txStart = start;
         gene.txEnd = end;
-        gene.cdsStart = start + random.nextInt(20);
-        gene.cdsEnd = end - random.nextInt(20);
-        gene.exonCount = random.nextInt(1) + 1;
+        gene.cdsStart = start + random.nextInt(21);
+        gene.cdsEnd = end - random.nextInt(21);
+        gene.exonCount = random.nextInt(2) + 1;
         if (gene.exonCount == 1) {
           gene.exonStarts = new long[] { start };
           gene.exonEnds = new long[] { end };
@@ -96,6 +96,8 @@ public class SgdGeneConverterTest {
           gene.exonEnds = new long[] { end - 30, end };
         }
         gene.proteinId = RandomStringUtils.randomAlphanumeric(PROTEIN_ID_SIZE);
+        genes.get(chromosome).add(gene);
+        start = end + random.nextInt(MAX_GENE_SEPARATOR);
       }
     }
   }
@@ -147,19 +149,24 @@ public class SgdGeneConverterTest {
     sgdGeneConverter.sgdGeneToTss(input, output, parameters);
 
     String[] lines = output.toString(CHARSET.name()).split(LINE_SEPARATOR);
-
-    int lineNumber = 0;
+    String[] headerColumns = lines[0].split(SEPARATOR, -1);
+    assertEquals("SEQ_NAME", headerColumns[0]);
+    assertEquals("START", headerColumns[1]);
+    assertEquals("END", headerColumns[2]);
+    assertEquals("STRAND", headerColumns[3]);
+    assertEquals("ANNO_TAG", headerColumns[4]);
+    int lineNumber = 1;
     for (String chromosome : genes.keySet()) {
       for (Gene gene : genes.get(chromosome)) {
         if (gene.strand.equals("-")) {
           continue;
         }
-        String[] columns = lines[lineNumber].split(SEPARATOR, -1);
-        assertEquals(chromosome, columns[0]);
-        assertEquals(gene.txStart, Long.parseLong(columns[1]));
-        assertEquals(gene.txEnd, Long.parseLong(columns[2]));
-        assertEquals(gene.strand, columns[3]);
-        assertEquals(gene.name, columns[4]);
+        String[] columns = lines[lineNumber++].split(SEPARATOR, -1);
+        assertEquals(chromosome + ":" + gene.txStart, chromosome, columns[0]);
+        assertEquals(chromosome + ":" + gene.txStart, gene.txStart, Long.parseLong(columns[1]));
+        assertEquals(chromosome + ":" + gene.txStart, gene.txEnd, Long.parseLong(columns[2]));
+        assertEquals(chromosome + ":" + gene.txStart, gene.strand, columns[3]);
+        assertEquals(chromosome + ":" + gene.txStart, gene.name, columns[4]);
       }
     }
     for (String chromosome : genes.keySet()) {
@@ -167,12 +174,12 @@ public class SgdGeneConverterTest {
         if (gene.strand.equals("+")) {
           continue;
         }
-        String[] columns = lines[lineNumber].split(SEPARATOR, -1);
-        assertEquals(chromosome, columns[0]);
-        assertEquals(gene.txStart, Long.parseLong(columns[1]));
-        assertEquals(gene.txEnd, Long.parseLong(columns[2]));
-        assertEquals(gene.strand, columns[3]);
-        assertEquals(gene.name, columns[4]);
+        String[] columns = lines[lineNumber++].split(SEPARATOR, -1);
+        assertEquals(chromosome + ":" + gene.txStart, chromosome, columns[0]);
+        assertEquals(chromosome + ":" + gene.txStart, gene.txStart, Long.parseLong(columns[1]));
+        assertEquals(chromosome + ":" + gene.txStart, gene.txEnd, Long.parseLong(columns[2]));
+        assertEquals(chromosome + ":" + gene.txStart, gene.strand, columns[3]);
+        assertEquals(chromosome + ":" + gene.txStart, gene.name, columns[4]);
       }
     }
   }
