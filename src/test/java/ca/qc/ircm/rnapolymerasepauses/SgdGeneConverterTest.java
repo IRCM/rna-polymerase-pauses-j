@@ -25,10 +25,13 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,10 +72,12 @@ public class SgdGeneConverterTest {
   }
 
   private void generateSgdGenes() {
-    genes = new HashMap<>();
+    List<String> chromosomes = IntStream.rangeClosed(1, CHROMOSOME_COUNT)
+        .mapToObj(index -> "chr" + index).collect(Collectors.toList());
+    Collections.sort(chromosomes);
+    genes = new LinkedHashMap<>();
     int id = 1;
-    for (int chromosomeIndex = 1; chromosomeIndex <= CHROMOSOME_COUNT; chromosomeIndex++) {
-      String chromosome = "chr" + chromosomeIndex;
+    for (String chromosome : chromosomes) {
       genes.put(chromosome, new ArrayList<>());
       int count = random.nextInt(MAX_GENE_PER_CHROMOSOME);
       long start = 0 + random.nextInt(MAX_GENE_SEPARATOR);

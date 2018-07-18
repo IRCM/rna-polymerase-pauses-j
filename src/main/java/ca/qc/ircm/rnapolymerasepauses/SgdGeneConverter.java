@@ -24,10 +24,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,7 +38,6 @@ import org.springframework.stereotype.Component;
 public class SgdGeneConverter {
   private static final String LINE_SEPARATOR = "\n";
   private static final String COLUMN_SEPARATOR = "\t";
-  private static final String NEGATIVE_STRAND = "-";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   protected SgdGeneConverter() {
@@ -57,8 +57,28 @@ public class SgdGeneConverter {
    */
   public void sgdGeneToTss(InputStream input, OutputStream output, SgdGeneToTssCommand parameters)
       throws IOException {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, CHARSET));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, CHARSET))) {
+    List<Gene> genes = new ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, CHARSET))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        String[] columns = line.split(COLUMN_SEPARATOR, -1);
+        Gene gene = new Gene();
+        gene.name = columns[1];
+        gene.chromosome = columns[2];
+        gene.strand = columns[3];
+        gene.start = Long.parseLong(columns[4]);
+        gene.end = Long.parseLong(columns[5]);
+        genes.add(gene);
+      }
+    }
+    Collections.sort(genes, (gene1, gene2) -> {
+      int compare = gene1.strand.compareTo(gene2.strand);
+      compare = compare == 0 ? gene1.chromosome.compareTo(gene2.chromosome) : compare;
+      compare = compare == 0 ? Long.compare(gene1.start, gene2.start) : compare;
+      compare = compare == 0 ? Long.compare(gene1.end, gene2.end) : compare;
+      return compare;
+    });
+    try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, CHARSET))) {
       writer.write("SEQ_NAME");
       writer.write(COLUMN_SEPARATOR);
       writer.write("START");
@@ -69,23 +89,26 @@ public class SgdGeneConverter {
       writer.write(COLUMN_SEPARATOR);
       writer.write("ANNO_TAG");
       writer.write(LINE_SEPARATOR);
-      StringWriter negativeStrandWriter = new StringWriter();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        String[] columns = line.split(COLUMN_SEPARATOR, -1);
-        Writer strandWriter = columns[3].equals(NEGATIVE_STRAND) ? negativeStrandWriter : writer;
-        strandWriter.write(columns[2]);
-        strandWriter.write(COLUMN_SEPARATOR);
-        strandWriter.write(columns[4]);
-        strandWriter.write(COLUMN_SEPARATOR);
-        strandWriter.write(columns[5]);
-        strandWriter.write(COLUMN_SEPARATOR);
-        strandWriter.write(columns[3]);
-        strandWriter.write(COLUMN_SEPARATOR);
-        strandWriter.write(columns[1]);
-        strandWriter.write(LINE_SEPARATOR);
+      for (Gene gene : genes) {
+        writer.write(gene.chromosome);
+        writer.write(COLUMN_SEPARATOR);
+        writer.write(String.valueOf(gene.start));
+        writer.write(COLUMN_SEPARATOR);
+        writer.write(String.valueOf(gene.end));
+        writer.write(COLUMN_SEPARATOR);
+        writer.write(gene.strand);
+        writer.write(COLUMN_SEPARATOR);
+        writer.write(gene.name);
+        writer.write(LINE_SEPARATOR);
       }
-      writer.write(negativeStrandWriter.toString());
     }
+  }
+
+  private static class Gene {
+    String name;
+    String chromosome;
+    long start;
+    long end;
+    String strand;
   }
 }
