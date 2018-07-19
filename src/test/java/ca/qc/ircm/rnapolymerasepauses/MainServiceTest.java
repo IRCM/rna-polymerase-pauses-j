@@ -23,7 +23,6 @@ import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -201,8 +200,7 @@ public class MainServiceTest {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
     mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
-    verify(wigConverter).wigToTrack(eq(System.in), eq(System.out),
-        wigToTrackCommandCaptor.capture());
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
   }
 
@@ -212,8 +210,7 @@ public class MainServiceTest {
     Files.createFile(chromosomeSizes);
     mainService
         .run(new String[] { WIG_TO_TRACK_COMMAND, "--chromoseSizes", chromosomeSizes.toString() });
-    verify(wigConverter).wigToTrack(eq(System.in), eq(System.out),
-        wigToTrackCommandCaptor.capture());
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
   }
 
@@ -221,13 +218,87 @@ public class MainServiceTest {
   public void run_WigToTrack_ChromosomeSizesNotExists() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
-    verify(wigConverter, never()).wigToTrack(any(), any(), any());
+    verify(wigConverter, never()).wigToTrack(any());
+  }
+
+  @Test
+  public void run_WigToTrack_Input() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
+    assertEquals(input, wigToTrackCommandCaptor.getValue().input);
+    assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_WigToTrack_InputLongName() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "--input", input.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
+    assertEquals(input, wigToTrackCommandCaptor.getValue().input);
+    assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_WigToTrack_InputNotExists() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(wigConverter, never()).wigToTrack(any());
+  }
+
+  @Test
+  public void run_WigToTrack_Output() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
+    assertEquals(output, wigToTrackCommandCaptor.getValue().output);
+    assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_WigToTrack_OutputLongName() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "--output", output.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
+    assertEquals(output, wigToTrackCommandCaptor.getValue().output);
+    assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_WigToTrack_OutputNotExists() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
+    assertEquals(output, wigToTrackCommandCaptor.getValue().output);
+    assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
   }
 
   @Test
   public void run_WigToTrack_Help() throws Throwable {
     mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-h" });
-    verify(wigConverter, never()).wigToTrack(any(), any(), any());
+    verify(wigConverter, never()).wigToTrack(any());
   }
 
   @Test
@@ -321,7 +392,7 @@ public class MainServiceTest {
   public void run_SgdGeneToTss_InputNotExists() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-i", input.toString() });
-    verify(sgdGeneConverter, never()).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+    verify(sgdGeneConverter, never()).sgdGeneToTss(any());
   }
 
   @Test

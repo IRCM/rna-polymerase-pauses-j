@@ -21,12 +21,6 @@ import ca.qc.ircm.rnapolymerasepauses.io.ChromosomeSizesParser;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,7 +39,6 @@ public class WigConverter {
   private static final String VARIABLE_STEP_PATTERN = "^variableStep( .*)?$";
   private static final String CHROMOSOME_PATTERN = "chrom=(chr)?([\\w\\d]+)";
   private static final String COMMENT = "#";
-  private static final Charset WIG_CHARSET = StandardCharsets.UTF_8;
   @Inject
   private ChromosomeSizesParser chromosomeSizesParser;
 
@@ -59,25 +52,19 @@ public class WigConverter {
   /**
    * Converts WIG file to track file.
    *
-   * @param input
-   *          WIG file
-   * @param output
-   *          output
    * @param parameters
    *          parameters
    * @throws IOException
    *           could not read WIG or write to output
    */
-  public void wigToTrack(InputStream input, OutputStream output, WigToTrackCommand parameters)
-      throws IOException {
+  public void wigToTrack(WigToTrackCommand parameters) throws IOException {
     final Map<String, Long> sizes =
         chromosomeSizesParser.chromosomeSizes(parameters.chromosomeSizes);
     Pattern browserPattern = Pattern.compile(BROWSER_PATTERN);
     Pattern trackPattern = Pattern.compile(TRACK_PATTERN);
     Pattern variableStepPattern = Pattern.compile(VARIABLE_STEP_PATTERN);
     Pattern chromosomePattern = Pattern.compile(CHROMOSOME_PATTERN);
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, WIG_CHARSET));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, WIG_CHARSET))) {
+    try (BufferedReader reader = parameters.reader(); BufferedWriter writer = parameters.writer()) {
       String chromosome;
       long position = 0;
       long size = 0;

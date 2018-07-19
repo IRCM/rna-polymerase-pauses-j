@@ -24,11 +24,11 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.rnapolymerasepauses.io.ChromosomeSizesParser;
 import ca.qc.ircm.rnapolymerasepauses.test.config.NonTransactionalTestAnnotations;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -54,7 +54,6 @@ public class WigConverterTest {
   private static final int CHROMOSOME_MAX_LENGTH = 10000;
   private static final double NO_SCORE_RATIO = 0.75;
   private static final String SEPARATOR = "\t";
-  private static final Charset WIG_CHARSET = StandardCharsets.UTF_8;
   private static final double DELTA = 0.000000001;
   private WigConverter wigConverter;
   @Mock
@@ -102,15 +101,8 @@ public class WigConverterTest {
     content = lines.stream().collect(Collectors.joining(LINE_SEPARATOR));
   }
 
-  @Test
-  public void wigToTrack() throws Throwable {
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(WIG_CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-    wigConverter.wigToTrack(input, output, parameters);
-
-    verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    String[] lines = output.toString(WIG_CHARSET.name()).split(LINE_SEPARATOR);
+  private void assertTrackContent(String trackContent) {
+    String[] lines = trackContent.split(LINE_SEPARATOR);
     int lineNumber = 0;
     for (String chromosome : sizes.keySet()) {
       assertEquals("chrom=" + chromosome, lines[lineNumber++]);
@@ -122,99 +114,71 @@ public class WigConverterTest {
             DELTA);
       }
     }
+  }
+
+  @Test
+  public void wigToTrack() throws Throwable {
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
+
+    wigConverter.wigToTrack(parameters);
+
+    verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void wigToTrack_Comments() throws Throwable {
     content = "#comment 1\n" + content.split("\n")[0] + "\n#comment 2\n"
         + Arrays.asList(content.split("\n")).stream().skip(1).collect(Collectors.joining("\n"));
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(WIG_CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    wigConverter.wigToTrack(input, output, parameters);
+    wigConverter.wigToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    String[] lines = output.toString(WIG_CHARSET.name()).split(LINE_SEPARATOR);
-    int lineNumber = 0;
-    for (String chromosome : sizes.keySet()) {
-      assertEquals("chrom=" + chromosome, lines[lineNumber++]);
-      for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score =
-            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
-                : 0.0;
-        assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
-            DELTA);
-      }
-    }
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void wigToTrack_Track() throws Throwable {
     content = "track name=\"my track\"\n" + content;
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(WIG_CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    wigConverter.wigToTrack(input, output, parameters);
+    wigConverter.wigToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    String[] lines = output.toString(WIG_CHARSET.name()).split(LINE_SEPARATOR);
-    int lineNumber = 0;
-    for (String chromosome : sizes.keySet()) {
-      assertEquals("chrom=" + chromosome, lines[lineNumber++]);
-      for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score =
-            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
-                : 0.0;
-        assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
-            DELTA);
-      }
-    }
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void wigToTrack_BrowserAndTrack() throws Throwable {
     content = "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n" + content;
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(WIG_CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    wigConverter.wigToTrack(input, output, parameters);
+    wigConverter.wigToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    String[] lines = output.toString(WIG_CHARSET.name()).split(LINE_SEPARATOR);
-    int lineNumber = 0;
-    for (String chromosome : sizes.keySet()) {
-      assertEquals("chrom=" + chromosome, lines[lineNumber++]);
-      for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score =
-            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
-                : 0.0;
-        assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
-            DELTA);
-      }
-    }
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void wigToTrack_BrowserAndTrackAndComment() throws Throwable {
     content =
         "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n#comment\n" + content;
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(WIG_CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    wigConverter.wigToTrack(input, output, parameters);
+    wigConverter.wigToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    String[] lines = output.toString(WIG_CHARSET.name()).split(LINE_SEPARATOR);
-    int lineNumber = 0;
-    for (String chromosome : sizes.keySet()) {
-      assertEquals("chrom=" + chromosome, lines[lineNumber++]);
-      for (long position = 0; position < sizes.get(chromosome); position++) {
-        double score =
-            scores.get(chromosome).containsKey(position) ? scores.get(chromosome).get(position)
-                : 0.0;
-        assertEquals(chromosome + ":" + position, score, Double.parseDouble(lines[lineNumber++]),
-            DELTA);
-      }
-    }
+    assertTrackContent(writer.toString());
   }
 }

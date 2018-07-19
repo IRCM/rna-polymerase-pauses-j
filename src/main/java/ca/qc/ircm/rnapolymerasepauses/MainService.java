@@ -133,7 +133,7 @@ public class MainService implements CommandLineRunner {
   private void wigToTrack(WigToTrackCommand command) {
     logger.debug("Converts WIG to track");
     try {
-      wigConverter.wigToTrack(System.in, System.out, command);
+      wigConverter.wigToTrack(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse WIG file");
       e.printStackTrace();
