@@ -120,7 +120,7 @@ public class MainService implements CommandLineRunner {
   private void bedToTrack(BedToTrackCommand command) {
     logger.debug("Converts BED to track");
     try {
-      bedConverter.bedToTrack(System.in, System.out, command);
+      bedConverter.bedToTrack(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse BED file");
       e.printStackTrace();

@@ -95,8 +95,7 @@ public class MainServiceTest {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
     mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
-    verify(bedConverter).bedToTrack(eq(System.in), eq(System.out),
-        bedToTrackCommandCaptor.capture());
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
   }
 
@@ -106,8 +105,7 @@ public class MainServiceTest {
     Files.createFile(chromosomeSizes);
     mainService
         .run(new String[] { BED_TO_TRACK_COMMAND, "--chromoseSizes", chromosomeSizes.toString() });
-    verify(bedConverter).bedToTrack(eq(System.in), eq(System.out),
-        bedToTrackCommandCaptor.capture());
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
   }
 
@@ -115,13 +113,87 @@ public class MainServiceTest {
   public void run_BedToTrack_ChromosomeSizesNotExists() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
-    verify(bedConverter, never()).bedToTrack(any(), any(), any());
+    verify(bedConverter, never()).bedToTrack(any());
+  }
+
+  @Test
+  public void run_BedToTrack_Input() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
+    assertEquals(input, bedToTrackCommandCaptor.getValue().input);
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_BedToTrack_InputLongName() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "--input", input.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
+    assertEquals(input, bedToTrackCommandCaptor.getValue().input);
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_BedToTrack_InputNotExists() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(bedConverter, never()).bedToTrack(any());
+  }
+
+  @Test
+  public void run_BedToTrack_Output() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
+    assertEquals(output, bedToTrackCommandCaptor.getValue().output);
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_BedToTrack_OutputLongName() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "--output", output.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
+    assertEquals(output, bedToTrackCommandCaptor.getValue().output);
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
+  }
+
+  @Test
+  public void run_BedToTrack_OutputNotExists() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
+    Files.createFile(chromosomeSizes);
+    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
+        chromosomeSizes.toString() });
+    verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
+    assertEquals(output, bedToTrackCommandCaptor.getValue().output);
+    assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
   }
 
   @Test
   public void run_BedToTrack_Help() throws Throwable {
     mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-h" });
-    verify(bedConverter, never()).bedToTrack(any(), any(), any());
+    verify(bedConverter, never()).bedToTrack(any());
   }
 
   @Test

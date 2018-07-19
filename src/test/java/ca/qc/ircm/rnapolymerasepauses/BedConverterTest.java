@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.rnapolymerasepauses.io.ChromosomeSizesParser;
 import ca.qc.ircm.rnapolymerasepauses.test.config.NonTransactionalTestAnnotations;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,7 +56,6 @@ public class BedConverterTest {
   private static final int BED_DATA_MAX_LENGTH = 100;
   private static final int MAX_SPACE_BETWEEN_DATA = 100;
   private static final String SEPARATOR = "\t";
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
   private static final double DELTA = 0.000000001;
   private BedConverter bedConverter;
   @Mock
@@ -155,75 +154,81 @@ public class BedConverterTest {
 
   @Test
   public void bedToTrack() throws Throwable {
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    bedConverter.bedToTrack(input, output, parameters);
+    bedConverter.bedToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    assertTrackContent(output.toString(CHARSET.name()));
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void bedToTrack_NoName() throws Throwable {
     writeBedDatas(false);
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    bedConverter.bedToTrack(input, output, parameters);
+    bedConverter.bedToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    assertTrackContent(output.toString(CHARSET.name()));
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void bedToTrack_Comments() throws Throwable {
     content = "#comment 1\n" + content.split("\n")[0] + "\n#comment 2\n"
         + Arrays.asList(content.split("\n")).stream().skip(1).collect(Collectors.joining("\n"));
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    bedConverter.bedToTrack(input, output, parameters);
+    bedConverter.bedToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    assertTrackContent(output.toString(CHARSET.name()));
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void bedToTrack_Track() throws Throwable {
     content = "track name=\"my track\"\n" + content;
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    bedConverter.bedToTrack(input, output, parameters);
+    bedConverter.bedToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    assertTrackContent(output.toString(CHARSET.name()));
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void bedToTrack_BrowserAndTrack() throws Throwable {
     content = "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n" + content;
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    bedConverter.bedToTrack(input, output, parameters);
+    bedConverter.bedToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    assertTrackContent(output.toString(CHARSET.name()));
+    assertTrackContent(writer.toString());
   }
 
   @Test
   public void bedToTrack_BrowserAndTrackAndComment() throws Throwable {
     content =
         "browser position chr7:127471196-127495720\ntrack name=\"my track\"\n#comment\n" + content;
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    bedConverter.bedToTrack(input, output, parameters);
+    bedConverter.bedToTrack(parameters);
 
     verify(chromosomeSizesParser).chromosomeSizes(chromosomeSizes);
-    assertTrackContent(output.toString(CHARSET.name()));
+    assertTrackContent(writer.toString());
   }
 
   private static class BedData {

@@ -21,12 +21,6 @@ import ca.qc.ircm.rnapolymerasepauses.io.ChromosomeSizesParser;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -43,7 +37,6 @@ public class BedConverter {
   private static final String TRACK_PATTERN = "^track( .*)?$";
   private static final String COMMENT = "#";
   private static final String CHROMOSOME_PATTERN = "chrom=%s";
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
   @Inject
   private ChromosomeSizesParser chromosomeSizesParser;
 
@@ -57,23 +50,17 @@ public class BedConverter {
   /**
    * Converts BED file to track file.
    *
-   * @param input
-   *          BED file
-   * @param output
-   *          output
    * @param parameters
    *          parameters
    * @throws IOException
    *           could not read BED or write to output
    */
-  public void bedToTrack(InputStream input, OutputStream output, BedToTrackCommand parameters)
-      throws IOException {
+  public void bedToTrack(BedToTrackCommand parameters) throws IOException {
     final Map<String, Long> sizes =
         chromosomeSizesParser.chromosomeSizes(parameters.chromosomeSizes);
     Pattern browserPattern = Pattern.compile(BROWSER_PATTERN);
     Pattern trackPattern = Pattern.compile(TRACK_PATTERN);
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, CHARSET));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, CHARSET))) {
+    try (BufferedReader reader = parameters.reader(); BufferedWriter writer = parameters.writer()) {
       String chromosome = "not a valid chromosome";
       long position = 0;
       long size = 0;
