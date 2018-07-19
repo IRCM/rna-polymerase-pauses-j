@@ -20,12 +20,6 @@ package ca.qc.ircm.rnapolymerasepauses;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,7 +31,6 @@ public class PausesConverter {
   private static final String SEQUENCE_NAME_SEPARATOR = "_";
   private static final String SEQUENCE_NAME_MARKER = ">";
   private static final String OUTPUT_SEPARATOR = "\t";
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   protected PausesConverter() {
   }
@@ -45,19 +38,13 @@ public class PausesConverter {
   /**
    * Converts pauses file to tab delimited file.
    *
-   * @param input
-   *          pauses file
-   * @param output
-   *          output
    * @param parameters
    *          parameters
    * @throws IOException
    *           could not read pauses file or write to output
    */
-  public void pausesToTabs(InputStream input, OutputStream output, PausesToTabsCommand parameters)
-      throws IOException {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, CHARSET));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, CHARSET))) {
+  public void pausesToTabs(PausesToTabsCommand parameters) throws IOException {
+    try (BufferedReader reader = parameters.reader(); BufferedWriter writer = parameters.writer()) {
       boolean first = true;
       String line;
       StringBuilder sequence = new StringBuilder();

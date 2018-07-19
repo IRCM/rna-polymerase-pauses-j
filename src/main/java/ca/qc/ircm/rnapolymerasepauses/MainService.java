@@ -146,7 +146,7 @@ public class MainService implements CommandLineRunner {
   private void pausesToTabs(PausesToTabsCommand command) {
     logger.debug("Converts pauses to tab delimited");
     try {
-      pausesConverter.pausesToTabs(System.in, System.out, command);
+      pausesConverter.pausesToTabs(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse pauses file");
       e.printStackTrace();

@@ -18,15 +18,15 @@
 package ca.qc.ircm.rnapolymerasepauses;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.rnapolymerasepauses.test.config.NonTransactionalTestAnnotations;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -53,7 +53,6 @@ public class PausesConverterTest {
   private static final int PAUSE_SEQUENCE_LENGHT = 40;
   private static final String PAUSE_SEPARATOR = "_";
   private static final String OUTPUT_SEPARATOR = "\t";
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
   private static final double DELTA = 0.000000001;
   private PausesConverter pausesConverter;
   @Mock
@@ -116,12 +115,13 @@ public class PausesConverterTest {
 
   @Test
   public void pausesToTabs() throws Throwable {
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    pausesConverter.pausesToTabs(input, output, parameters);
+    pausesConverter.pausesToTabs(parameters);
 
-    String[] lines = new String(output.toByteArray(), CHARSET).split(LINE_SEPARATOR);
+    String[] lines = writer.toString().split(LINE_SEPARATOR);
     for (int i = 0; i < pauses.size(); i++) {
       Pause pause = pauses.get(i);
       String[] columns = lines[i].split(OUTPUT_SEPARATOR);
@@ -142,12 +142,13 @@ public class PausesConverterTest {
     StringWriter contentAsWriter = new StringWriter();
     writePauses(pauses, contentAsWriter);
     content = contentAsWriter.toString();
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    pausesConverter.pausesToTabs(input, output, parameters);
+    pausesConverter.pausesToTabs(parameters);
 
-    String[] lines = new String(output.toByteArray(), CHARSET).split(LINE_SEPARATOR);
+    String[] lines = writer.toString().split(LINE_SEPARATOR);
     for (int i = 0; i < pauses.size(); i++) {
       Pause pause = pauses.get(i);
       String[] columns = lines[i].split(OUTPUT_SEPARATOR, -1);
@@ -170,12 +171,13 @@ public class PausesConverterTest {
     StringWriter contentAsWriter = new StringWriter();
     writePauses(pauses, contentAsWriter);
     content = contentAsWriter.toString();
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    pausesConverter.pausesToTabs(input, output, parameters);
+    pausesConverter.pausesToTabs(parameters);
 
-    String[] lines = new String(output.toByteArray(), CHARSET).split(LINE_SEPARATOR);
+    String[] lines = writer.toString().split(LINE_SEPARATOR);
     for (int i = 0; i < pauses.size(); i++) {
       Pause pause = pauses.get(i);
       String[] columns = lines[i].split(OUTPUT_SEPARATOR, -1);

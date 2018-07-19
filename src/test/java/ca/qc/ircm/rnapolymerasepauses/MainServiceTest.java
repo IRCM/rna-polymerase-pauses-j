@@ -233,14 +233,64 @@ public class MainServiceTest {
   @Test
   public void run_PausesToTabs() throws Throwable {
     mainService.run(new String[] { PAUSES_TO_TABS_COMMAND });
-    verify(pausesConverter).pausesToTabs(eq(System.in), eq(System.out),
-        pausesToTabsCommandCaptor.capture());
+    verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
+  }
+
+  @Test
+  public void run_PausesToTabs_Input() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-i", input.toString() });
+    verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
+    assertEquals(input, pausesToTabsCommandCaptor.getValue().input);
+  }
+
+  @Test
+  public void run_PausesToTabs_InputLongName() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "--input", input.toString() });
+    verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
+    assertEquals(input, pausesToTabsCommandCaptor.getValue().input);
+  }
+
+  @Test
+  public void run_PausesToTabs_InputNotExists() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-i", input.toString() });
+    verify(pausesConverter, never()).pausesToTabs(any());
+  }
+
+  @Test
+  public void run_PausesToTabs_Output() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-o", output.toString() });
+    verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
+    assertEquals(output, pausesToTabsCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_PausesToTabs_OutputLongName() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "--output", output.toString() });
+    verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
+    assertEquals(output, pausesToTabsCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_PausesToTabs_OutputNotExists() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-o", output.toString() });
+    verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
+    assertEquals(output, pausesToTabsCommandCaptor.getValue().output);
   }
 
   @Test
   public void run_PausesToTabs_Help() throws Throwable {
     mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-h" });
-    verify(pausesConverter, never()).pausesToTabs(any(), any(), any());
+    verify(pausesConverter, never()).pausesToTabs(any());
   }
 
   @Test
