@@ -18,12 +18,13 @@
 package ca.qc.ircm.rnapolymerasepauses;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import ca.qc.ircm.rnapolymerasepauses.test.config.NonTransactionalTestAnnotations;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,7 +53,6 @@ public class SgdGeneConverterTest {
   private static final int PROTEIN_ID_SIZE = 15;
   private static final String SEPARATOR = "\t";
   private static final String EXON_SEPARATOR = ",";
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
   private SgdGeneConverter sgdGeneConverter;
   @Mock
   private SgdGeneToTssCommand parameters;
@@ -148,12 +148,13 @@ public class SgdGeneConverterTest {
 
   @Test
   public void sgdGeneToTss() throws Throwable {
-    ByteArrayInputStream input = new ByteArrayInputStream(content.getBytes(CHARSET));
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
 
-    sgdGeneConverter.sgdGeneToTss(input, output, parameters);
+    sgdGeneConverter.sgdGeneToTss(parameters);
 
-    String[] lines = output.toString(CHARSET.name()).split(LINE_SEPARATOR);
+    String[] lines = writer.toString().split(LINE_SEPARATOR);
     String[] headerColumns = lines[0].split(SEPARATOR, -1);
     assertEquals("SEQ_NAME", headerColumns[0]);
     assertEquals("START", headerColumns[1]);

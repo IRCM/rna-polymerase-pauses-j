@@ -20,12 +20,6 @@ package ca.qc.ircm.rnapolymerasepauses;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +32,6 @@ import org.springframework.stereotype.Component;
 public class SgdGeneConverter {
   private static final String LINE_SEPARATOR = "\n";
   private static final String COLUMN_SEPARATOR = "\t";
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   protected SgdGeneConverter() {
   }
@@ -46,19 +39,14 @@ public class SgdGeneConverter {
   /**
    * Converts SGD gene to TSS file.
    *
-   * @param input
-   *          SGD gene file
-   * @param output
-   *          output
    * @param parameters
    *          parameters
    * @throws IOException
    *           could not read SGD gene file or write to output
    */
-  public void sgdGeneToTss(InputStream input, OutputStream output, SgdGeneToTssCommand parameters)
-      throws IOException {
+  public void sgdGeneToTss(SgdGeneToTssCommand parameters) throws IOException {
     List<Gene> genes = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, CHARSET))) {
+    try (BufferedReader reader = parameters.reader()) {
       String line;
       while ((line = reader.readLine()) != null) {
         String[] columns = line.split(COLUMN_SEPARATOR, -1);
@@ -78,7 +66,7 @@ public class SgdGeneConverter {
       compare = compare == 0 ? Long.compare(gene1.end, gene2.end) : compare;
       return compare;
     });
-    try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, CHARSET))) {
+    try (BufferedWriter writer = parameters.writer()) {
       writer.write("SEQ_NAME");
       writer.write(COLUMN_SEPARATOR);
       writer.write("START");

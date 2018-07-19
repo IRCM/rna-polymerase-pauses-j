@@ -296,14 +296,64 @@ public class MainServiceTest {
   @Test
   public void run_SgdGeneToTss() throws Throwable {
     mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND });
-    verify(sgdGeneConverter).sgdGeneToTss(eq(System.in), eq(System.out),
-        sgdGeneToTssCommandCaptor.capture());
+    verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+  }
+
+  @Test
+  public void run_SgdGeneToTss_Input() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-i", input.toString() });
+    verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+    assertEquals(input, sgdGeneToTssCommandCaptor.getValue().input);
+  }
+
+  @Test
+  public void run_SgdGeneToTss_InputLongName() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "--input", input.toString() });
+    verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+    assertEquals(input, sgdGeneToTssCommandCaptor.getValue().input);
+  }
+
+  @Test
+  public void run_SgdGeneToTss_InputNotExists() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-i", input.toString() });
+    verify(sgdGeneConverter, never()).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+  }
+
+  @Test
+  public void run_SgdGeneToTss_Output() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-o", output.toString() });
+    verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+    assertEquals(output, sgdGeneToTssCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_SgdGeneToTss_OutputLongName() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "--output", output.toString() });
+    verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+    assertEquals(output, sgdGeneToTssCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_SgdGeneToTss_OutputNotExists() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-o", output.toString() });
+    verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
+    assertEquals(output, sgdGeneToTssCommandCaptor.getValue().output);
   }
 
   @Test
   public void run_SgdGeneToTss_Help() throws Throwable {
     mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-h" });
-    verify(sgdGeneConverter, never()).sgdGeneToTss(any(), any(), any());
+    verify(sgdGeneConverter, never()).sgdGeneToTss(any());
   }
 
   @Test

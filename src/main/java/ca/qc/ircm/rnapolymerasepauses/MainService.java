@@ -159,7 +159,7 @@ public class MainService implements CommandLineRunner {
   private void sgdGeneToTss(SgdGeneToTssCommand command) {
     logger.debug("Converts SGD gene to TSS");
     try {
-      sgdGeneConverter.sgdGeneToTss(System.in, System.out, command);
+      sgdGeneConverter.sgdGeneToTss(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse SGD gene file");
       e.printStackTrace();
