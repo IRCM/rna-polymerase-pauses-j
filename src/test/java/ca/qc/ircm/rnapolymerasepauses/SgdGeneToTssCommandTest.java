@@ -19,6 +19,7 @@ package ca.qc.ircm.rnapolymerasepauses;
 
 import static org.junit.Assert.assertEquals;
 
+import ca.qc.ircm.rnapolymerasepauses.test.config.NonTransactionalTestAnnotations;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -38,7 +39,11 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@NonTransactionalTestAnnotations
 public class SgdGeneToTssCommandTest {
   private static final Charset CHARSET = StandardCharsets.UTF_8;
   private final InputStream systemIn = System.in;
