@@ -28,7 +28,7 @@
   <name>rna-polymerase-pauses</name>
   <version>1-SNAPSHOT</version>
   <inceptionYear>2017</inceptionYear>
-  <description>Tools for BED files</description>
+  <description>Tools to help finding RNA polymerase pause sites</description>
   <licenses>
     <license>
       <name>GNU General Public License</name>
