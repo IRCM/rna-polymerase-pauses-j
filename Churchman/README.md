@@ -3,6 +3,8 @@ RNA polymerase pauses - Churchman LS. et al.
 
 This folder contains a copy of the code from Churchman et al. on which we made minor modifications in order to allow more parameters to be passed.
 
+This code is under an unknown license. Please ask the authors of the publication before using it.
+
 Reference
 ---------
 
