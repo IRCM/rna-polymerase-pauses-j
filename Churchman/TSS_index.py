@@ -141,10 +141,8 @@ def main(argv=None):
                         line1=trackFile1.readline()
                         
                     chr1=line1.replace('\n','').split('=')
-                    print chr1
                     chr1=chr1[1]
                     lineNum1 = 0
-                    print chr1
                 while lineNum1<start-1:
                     line1=trackFile1.readline()
                     lineNum1+=1

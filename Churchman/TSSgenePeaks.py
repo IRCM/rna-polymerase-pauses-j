@@ -19,6 +19,8 @@ Updated: May 4, 2011
 * all options overided in script! Edit script to change these.
      -h     print this help message
      -f     data file
+     -t     TSS file to use
+     -g     Genome file to use
      -s     peak strength min
      -S     peak strength max
      -c     gene levels cutoff
@@ -36,9 +38,12 @@ import os
 def main(argv=None):
     if argv is None:
         argv = sys.argv
+    condition=''
+    tssFile=''
+    genomeFile=''
 
     try:
-        optlist, args = getopt(argv[1:], "hf:s:S:c:o:")
+        optlist, args = getopt(argv[1:], "hf:t:g:s:S:c:o:")
     except:
         print ""
         print HELP_STRING
@@ -47,14 +52,18 @@ def main(argv=None):
    
        
     for (opt, opt_arg) in optlist:
-        #print opt
-        #print opt_arg
+        # print opt
+        # print opt_arg
         if opt == '-h':
             print ""
             print HELP_STRING
             sys.exit(1)
         elif opt == '-f':
             condition = opt_arg
+        elif opt == '-t':
+            tssFile = opt_arg
+        elif opt == '-g':
+            genomeFile = opt_arg
         elif opt == '-s':
             peakStrength = int(opt_arg)
         elif opt == '-S':
@@ -67,10 +76,8 @@ def main(argv=None):
          
     
     
-    condition = '/Users/stirls/lib/data/100917/Alignment/100919/t_IP_SET1'
-    inputFile3 = '/Users/stirls/lib/TSS_data/TSS.txt'
-    genomeFile = '/Users/stirls/lib/bowtie-0.12.0/genomes/sc_sgd_gff_20091011.fna'
-    outputBase = '/Users/stirls/lib/analysis/pausing/data/'
+    #condition = '/Users/poitrac/Downloads/Churchman/GSM617027_WT_NC'
+    outputBase = os.path.dirname(os.path.realpath(__file__)) + "/"
     
     seqLength=15
     cutoff=0
@@ -89,7 +96,7 @@ def main(argv=None):
     
     peakSeq,peakPos =a.getPeakSeqs(genomeFile,condition+'_plus.txt',condition+'_minus.txt',condition+'_index.txt',seqLength,cutoff,peakStrengthMin,window,fold,peakmin,tnorm_thresh,rounds)
     filenames=condition.split('/')
-    oFile = outputBase+dir+'/'+filenames[-4]+filenames[-1]+'_%s_%s_%s_%s_%s.csv' % (window,fold,peakmin,tnorm_thresh,rounds)
+    oFile = outputBase+dir+'/'+filenames[-1]+'_%s_%s_%s_%s_%s.csv' % (window,fold,peakmin,tnorm_thresh,rounds)
     outFile = open(oFile, 'w')
     
     upstream=[seq[0] for seq in peakSeq]
