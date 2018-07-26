@@ -76,7 +76,6 @@ def main(argv=None):
          
     
     
-    #condition = '/Users/poitrac/Downloads/Churchman/GSM617027_WT_NC'
     outputBase = os.path.dirname(os.path.realpath(__file__)) + "/"
     
     seqLength=15
