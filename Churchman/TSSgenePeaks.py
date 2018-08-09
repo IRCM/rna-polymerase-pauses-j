@@ -76,7 +76,7 @@ def main(argv=None):
          
     
     
-    outputBase = os.path.dirname(os.path.realpath(__file__)) + "/"
+    outputBase = os.path.dirname(os.path.realpath(condition)) + "/"
     
     seqLength=15
     cutoff=0
