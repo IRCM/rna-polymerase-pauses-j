@@ -18,6 +18,7 @@
 package ca.qc.ircm.rnapolymerasepauses;
 
 import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
+import static ca.qc.ircm.rnapolymerasepauses.FakeGeneCommand.FAKE_GENE_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
@@ -52,6 +53,8 @@ public class MainServiceTest {
   private PausesConverter pausesConverter;
   @Mock
   private SgdGeneConverter sgdGeneConverter;
+  @Mock
+  private FakeGene fakeGene;
   @Captor
   private ArgumentCaptor<BedToTrackCommand> bedToTrackCommandCaptor;
   @Captor
@@ -60,24 +63,27 @@ public class MainServiceTest {
   private ArgumentCaptor<PausesToTabsCommand> pausesToTabsCommandCaptor;
   @Captor
   private ArgumentCaptor<SgdGeneToTssCommand> sgdGeneToTssCommandCaptor;
+  @Captor
+  private ArgumentCaptor<FakeGeneCommand> fakeGeneCommandCaptor;
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
   public void beforeTest() {
-    mainService =
-        new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter, true);
+    mainService = new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter,
+        fakeGene, true);
   }
 
   @Test
   public void run_RunnerDisabled() {
-    mainService =
-        new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter, false);
+    mainService = new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter,
+        fakeGene, false);
     mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", "1" });
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
     verifyZeroInteractions(sgdGeneConverter);
+    verifyZeroInteractions(fakeGene);
   }
 
   @Test
@@ -87,6 +93,7 @@ public class MainServiceTest {
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
     verifyZeroInteractions(sgdGeneConverter);
+    verifyZeroInteractions(fakeGene);
   }
 
   @Test
@@ -428,11 +435,75 @@ public class MainServiceTest {
   }
 
   @Test
+  public void run_FakeGene() throws Throwable {
+    mainService.run(new String[] { FAKE_GENE_COMMAND });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+  }
+
+  @Test
+  public void run_FakeGene_Input() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "-i", input.toString() });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(input, fakeGeneCommandCaptor.getValue().input);
+  }
+
+  @Test
+  public void run_FakeGene_InputLongName() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "--input", input.toString() });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(input, fakeGeneCommandCaptor.getValue().input);
+  }
+
+  @Test
+  public void run_FakeGene_InputNotExists() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "-i", input.toString() });
+    verify(sgdGeneConverter, never()).sgdGeneToTss(any());
+  }
+
+  @Test
+  public void run_FakeGene_Output() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "-o", output.toString() });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(output, fakeGeneCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_FakeGene_OutputLongName() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "--output", output.toString() });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(output, fakeGeneCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_FakeGene_OutputNotExists() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "-o", output.toString() });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(output, fakeGeneCommandCaptor.getValue().output);
+  }
+
+  @Test
+  public void run_FakeGene_Help() throws Throwable {
+    mainService.run(new String[] { FAKE_GENE_COMMAND, "-h" });
+    verify(fakeGene, never()).fakeGene(any());
+  }
+
+  @Test
   public void run_Other() throws Throwable {
     mainService.run(new String[] { "other" });
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
     verifyZeroInteractions(sgdGeneConverter);
+    verifyZeroInteractions(fakeGene);
   }
 }

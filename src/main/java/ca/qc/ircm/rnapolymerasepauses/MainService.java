@@ -18,6 +18,7 @@
 package ca.qc.ircm.rnapolymerasepauses;
 
 import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
+import static ca.qc.ircm.rnapolymerasepauses.FakeGeneCommand.FAKE_GENE_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND;
 import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
@@ -46,6 +47,8 @@ public class MainService implements CommandLineRunner {
   private PausesConverter pausesConverter;
   @Inject
   private SgdGeneConverter sgdGeneConverter;
+  @Inject
+  private FakeGene fakeGene;
   @Value("${spring.runner.enabled}")
   private boolean runnerEnabled;
 
@@ -53,11 +56,13 @@ public class MainService implements CommandLineRunner {
   }
 
   protected MainService(BedConverter bedConverter, WigConverter wigConverter,
-      PausesConverter pausesConverter, SgdGeneConverter sgdGeneConverter, boolean runnerEnabled) {
+      PausesConverter pausesConverter, SgdGeneConverter sgdGeneConverter, FakeGene fakeGene,
+      boolean runnerEnabled) {
     this.bedConverter = bedConverter;
     this.wigConverter = wigConverter;
     this.pausesConverter = pausesConverter;
     this.sgdGeneConverter = sgdGeneConverter;
+    this.fakeGene = fakeGene;
     this.runnerEnabled = runnerEnabled;
   }
 
@@ -78,9 +83,10 @@ public class MainService implements CommandLineRunner {
     WigToTrackCommand wigToTrackCommand = new WigToTrackCommand();
     PausesToTabsCommand pausesToTabsCommand = new PausesToTabsCommand();
     SgdGeneToTssCommand sgdGeneToTssCommand = new SgdGeneToTssCommand();
+    FakeGeneCommand fakeGeneCommand = new FakeGeneCommand();
     JCommander command = JCommander.newBuilder().addObject(mainCommand)
         .addCommand(bedToTrackCommand).addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand)
-        .addCommand(sgdGeneToTssCommand).build();
+        .addCommand(sgdGeneToTssCommand).addCommand(fakeGeneCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -109,6 +115,12 @@ public class MainService implements CommandLineRunner {
           command.usage(SGD_GENE_TO_TSS_COMMAND);
         } else {
           sgdGeneToTss(sgdGeneToTssCommand);
+        }
+      } else if (command.getParsedCommand().equals(FAKE_GENE_COMMAND)) {
+        if (fakeGeneCommand.help) {
+          command.usage(FAKE_GENE_COMMAND);
+        } else {
+          fakeGene(fakeGeneCommand);
         }
       }
     } catch (ParameterException e) {
@@ -162,6 +174,19 @@ public class MainService implements CommandLineRunner {
       sgdGeneConverter.sgdGeneToTss(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse SGD gene file");
+      e.printStackTrace();
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+      e.printStackTrace();
+    }
+  }
+
+  private void fakeGene(FakeGeneCommand command) {
+    logger.debug("Generates a fake gene file covering all chromosomes");
+    try {
+      fakeGene.fakeGene(command);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse chromosome sizes file");
       e.printStackTrace();
     } catch (IOException e) {
       System.err.println("Could not read input or write to output");
