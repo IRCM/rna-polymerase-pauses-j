@@ -75,12 +75,14 @@ public class MainService implements CommandLineRunner {
     MainCommand mainCommand = new MainCommand();
     BedToTrackCommand bedToTrackCommand = new BedToTrackCommand();
     WigToTrackCommand wigToTrackCommand = new WigToTrackCommand();
+    PausesToBedCommand pausesToBedCommand = new PausesToBedCommand();
     PausesToTabsCommand pausesToTabsCommand = new PausesToTabsCommand();
     SgdGeneToTssCommand sgdGeneToTssCommand = new SgdGeneToTssCommand();
     FakeGeneCommand fakeGeneCommand = new FakeGeneCommand();
     JCommander command = JCommander.newBuilder().addObject(mainCommand)
-        .addCommand(bedToTrackCommand).addCommand(wigToTrackCommand).addCommand(pausesToTabsCommand)
-        .addCommand(sgdGeneToTssCommand).addCommand(fakeGeneCommand).build();
+        .addCommand(bedToTrackCommand).addCommand(wigToTrackCommand).addCommand(pausesToBedCommand)
+        .addCommand(pausesToTabsCommand).addCommand(sgdGeneToTssCommand).addCommand(fakeGeneCommand)
+        .build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -97,6 +99,12 @@ public class MainService implements CommandLineRunner {
           command.usage(WigToTrackCommand.COMMAND);
         } else {
           wigToTrack(wigToTrackCommand);
+        }
+      } else if (command.getParsedCommand().equals(PausesToBedCommand.COMMAND)) {
+        if (pausesToBedCommand.help) {
+          command.usage(PausesToBedCommand.COMMAND);
+        } else {
+          pausesToBed(pausesToBedCommand);
         }
       } else if (command.getParsedCommand().equals(PausesToTabsCommand.COMMAND)) {
         if (pausesToTabsCommand.help) {
@@ -142,6 +150,19 @@ public class MainService implements CommandLineRunner {
       wigConverter.wigToTrack(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse WIG file");
+      e.printStackTrace();
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+      e.printStackTrace();
+    }
+  }
+
+  private void pausesToBed(PausesToBedCommand command) {
+    logger.debug("Converts pauses to BED");
+    try {
+      pausesConverter.pausesToBed(command);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse pauses file");
       e.printStackTrace();
     } catch (IOException e) {
       System.err.println("Could not read input or write to output");
