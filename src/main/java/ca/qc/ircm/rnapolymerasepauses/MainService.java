@@ -17,12 +17,6 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
-import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.FakeGeneCommand.FAKE_GENE_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import java.io.IOException;
@@ -92,33 +86,33 @@ public class MainService implements CommandLineRunner {
       command.parse(args);
       if (command.getParsedCommand() == null || mainCommand.help) {
         command.usage();
-      } else if (command.getParsedCommand().equals(BED_TO_TRACK_COMMAND)) {
+      } else if (command.getParsedCommand().equals(BedToTrackCommand.COMMAND)) {
         if (bedToTrackCommand.help) {
-          command.usage(BED_TO_TRACK_COMMAND);
+          command.usage(BedToTrackCommand.COMMAND);
         } else {
           bedToTrack(bedToTrackCommand);
         }
-      } else if (command.getParsedCommand().equals(WIG_TO_TRACK_COMMAND)) {
+      } else if (command.getParsedCommand().equals(WigToTrackCommand.COMMAND)) {
         if (wigToTrackCommand.help) {
-          command.usage(WIG_TO_TRACK_COMMAND);
+          command.usage(WigToTrackCommand.COMMAND);
         } else {
           wigToTrack(wigToTrackCommand);
         }
-      } else if (command.getParsedCommand().equals(PAUSES_TO_TABS_COMMAND)) {
+      } else if (command.getParsedCommand().equals(PausesToTabsCommand.COMMAND)) {
         if (pausesToTabsCommand.help) {
-          command.usage(PAUSES_TO_TABS_COMMAND);
+          command.usage(PausesToTabsCommand.COMMAND);
         } else {
           pausesToTabs(pausesToTabsCommand);
         }
-      } else if (command.getParsedCommand().equals(SGD_GENE_TO_TSS_COMMAND)) {
+      } else if (command.getParsedCommand().equals(SgdGeneToTssCommand.COMMAND)) {
         if (sgdGeneToTssCommand.help) {
-          command.usage(SGD_GENE_TO_TSS_COMMAND);
+          command.usage(SgdGeneToTssCommand.COMMAND);
         } else {
           sgdGeneToTss(sgdGeneToTssCommand);
         }
-      } else if (command.getParsedCommand().equals(FAKE_GENE_COMMAND)) {
+      } else if (command.getParsedCommand().equals(FakeGeneCommand.COMMAND)) {
         if (fakeGeneCommand.help) {
-          command.usage(FAKE_GENE_COMMAND);
+          command.usage(FakeGeneCommand.COMMAND);
         } else {
           fakeGene(fakeGeneCommand);
         }

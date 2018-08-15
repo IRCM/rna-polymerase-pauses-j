@@ -17,11 +17,7 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
-import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.BED_TO_TRACK_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.FakeGeneCommand.FAKE_GENE_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.PausesToTabsCommand.PAUSES_TO_TABS_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND;
-import static ca.qc.ircm.rnapolymerasepauses.WigToTrackCommand.WIG_TO_TRACK_COMMAND;
+import static ca.qc.ircm.rnapolymerasepauses.BedToTrackCommand.COMMAND;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
@@ -78,7 +74,7 @@ public class MainServiceTest {
   public void run_RunnerDisabled() {
     mainService = new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter,
         fakeGene, false);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", "1" });
+    mainService.run(new String[] { COMMAND, "-s", "1" });
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
@@ -100,7 +96,7 @@ public class MainServiceTest {
   public void run_BedToTrack() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-s", chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
   }
@@ -109,8 +105,8 @@ public class MainServiceTest {
   public void run_BedToTrack_ChromosomeSizesLongName() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService
-        .run(new String[] { BED_TO_TRACK_COMMAND, "--chromoseSizes", chromosomeSizes.toString() });
+    mainService.run(
+        new String[] { BedToTrackCommand.COMMAND, "--chromoseSizes", chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, bedToTrackCommandCaptor.getValue().chromosomeSizes);
   }
@@ -118,7 +114,7 @@ public class MainServiceTest {
   @Test
   public void run_BedToTrack_ChromosomeSizesNotExists() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-s", chromosomeSizes.toString() });
     verify(bedConverter, never()).bedToTrack(any());
   }
 
@@ -128,7 +124,7 @@ public class MainServiceTest {
     Files.createFile(input);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-i", input.toString(), "-s",
         chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(input, bedToTrackCommandCaptor.getValue().input);
@@ -141,7 +137,7 @@ public class MainServiceTest {
     Files.createFile(input);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "--input", input.toString(), "-s",
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "--input", input.toString(), "-s",
         chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(input, bedToTrackCommandCaptor.getValue().input);
@@ -153,7 +149,7 @@ public class MainServiceTest {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-i", input.toString(), "-s",
         chromosomeSizes.toString() });
     verify(bedConverter, never()).bedToTrack(any());
   }
@@ -164,7 +160,7 @@ public class MainServiceTest {
     Files.createFile(output);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-o", output.toString(), "-s",
         chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(output, bedToTrackCommandCaptor.getValue().output);
@@ -177,7 +173,7 @@ public class MainServiceTest {
     Files.createFile(output);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "--output", output.toString(), "-s",
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "--output", output.toString(), "-s",
         chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(output, bedToTrackCommandCaptor.getValue().output);
@@ -189,7 +185,7 @@ public class MainServiceTest {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-o", output.toString(), "-s",
         chromosomeSizes.toString() });
     verify(bedConverter).bedToTrack(bedToTrackCommandCaptor.capture());
     assertEquals(output, bedToTrackCommandCaptor.getValue().output);
@@ -198,7 +194,7 @@ public class MainServiceTest {
 
   @Test
   public void run_BedToTrack_Help() throws Throwable {
-    mainService.run(new String[] { BED_TO_TRACK_COMMAND, "-h" });
+    mainService.run(new String[] { BedToTrackCommand.COMMAND, "-h" });
     verify(bedConverter, never()).bedToTrack(any());
   }
 
@@ -206,7 +202,8 @@ public class MainServiceTest {
   public void run_WigToTrack() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
+    mainService.run(
+        new String[] { WigToTrackCommand.COMMAND, "-s", chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
   }
@@ -215,8 +212,8 @@ public class MainServiceTest {
   public void run_WigToTrack_ChromosomeSizesLongName() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService
-        .run(new String[] { WIG_TO_TRACK_COMMAND, "--chromoseSizes", chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "--chromoseSizes",
+        chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
   }
@@ -224,7 +221,8 @@ public class MainServiceTest {
   @Test
   public void run_WigToTrack_ChromosomeSizesNotExists() throws Throwable {
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-s", chromosomeSizes.toString() });
+    mainService.run(
+        new String[] { WigToTrackCommand.COMMAND, "-s", chromosomeSizes.toString() });
     verify(wigConverter, never()).wigToTrack(any());
   }
 
@@ -234,8 +232,8 @@ public class MainServiceTest {
     Files.createFile(input);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
-        chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "-i", input.toString(),
+        "-s", chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(input, wigToTrackCommandCaptor.getValue().input);
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
@@ -247,8 +245,8 @@ public class MainServiceTest {
     Files.createFile(input);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "--input", input.toString(), "-s",
-        chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "--input",
+        input.toString(), "-s", chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(input, wigToTrackCommandCaptor.getValue().input);
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
@@ -259,8 +257,8 @@ public class MainServiceTest {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-i", input.toString(), "-s",
-        chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "-i", input.toString(),
+        "-s", chromosomeSizes.toString() });
     verify(wigConverter, never()).wigToTrack(any());
   }
 
@@ -270,8 +268,8 @@ public class MainServiceTest {
     Files.createFile(output);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
-        chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "-o", output.toString(),
+        "-s", chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(output, wigToTrackCommandCaptor.getValue().output);
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
@@ -283,8 +281,8 @@ public class MainServiceTest {
     Files.createFile(output);
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "--output", output.toString(), "-s",
-        chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "--output",
+        output.toString(), "-s", chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(output, wigToTrackCommandCaptor.getValue().output);
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
@@ -295,8 +293,8 @@ public class MainServiceTest {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Path chromosomeSizes = temporaryFolder.getRoot().toPath().resolve("chromosomeSizes.txt");
     Files.createFile(chromosomeSizes);
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-o", output.toString(), "-s",
-        chromosomeSizes.toString() });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "-o", output.toString(),
+        "-s", chromosomeSizes.toString() });
     verify(wigConverter).wigToTrack(wigToTrackCommandCaptor.capture());
     assertEquals(output, wigToTrackCommandCaptor.getValue().output);
     assertEquals(chromosomeSizes, wigToTrackCommandCaptor.getValue().chromosomeSizes);
@@ -304,13 +302,13 @@ public class MainServiceTest {
 
   @Test
   public void run_WigToTrack_Help() throws Throwable {
-    mainService.run(new String[] { WIG_TO_TRACK_COMMAND, "-h" });
+    mainService.run(new String[] { WigToTrackCommand.COMMAND, "-h" });
     verify(wigConverter, never()).wigToTrack(any());
   }
 
   @Test
   public void run_PausesToTabs() throws Throwable {
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND });
     verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
   }
 
@@ -318,7 +316,7 @@ public class MainServiceTest {
   public void run_PausesToTabs_Input() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Files.createFile(input);
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-i", input.toString() });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "-i", input.toString() });
     verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
     assertEquals(input, pausesToTabsCommandCaptor.getValue().input);
   }
@@ -327,7 +325,7 @@ public class MainServiceTest {
   public void run_PausesToTabs_InputLongName() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Files.createFile(input);
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "--input", input.toString() });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "--input", input.toString() });
     verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
     assertEquals(input, pausesToTabsCommandCaptor.getValue().input);
   }
@@ -335,7 +333,7 @@ public class MainServiceTest {
   @Test
   public void run_PausesToTabs_InputNotExists() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-i", input.toString() });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "-i", input.toString() });
     verify(pausesConverter, never()).pausesToTabs(any());
   }
 
@@ -343,7 +341,7 @@ public class MainServiceTest {
   public void run_PausesToTabs_Output() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Files.createFile(output);
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-o", output.toString() });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "-o", output.toString() });
     verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
     assertEquals(output, pausesToTabsCommandCaptor.getValue().output);
   }
@@ -352,7 +350,7 @@ public class MainServiceTest {
   public void run_PausesToTabs_OutputLongName() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Files.createFile(output);
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "--output", output.toString() });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "--output", output.toString() });
     verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
     assertEquals(output, pausesToTabsCommandCaptor.getValue().output);
   }
@@ -360,20 +358,20 @@ public class MainServiceTest {
   @Test
   public void run_PausesToTabs_OutputNotExists() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-o", output.toString() });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "-o", output.toString() });
     verify(pausesConverter).pausesToTabs(pausesToTabsCommandCaptor.capture());
     assertEquals(output, pausesToTabsCommandCaptor.getValue().output);
   }
 
   @Test
   public void run_PausesToTabs_Help() throws Throwable {
-    mainService.run(new String[] { PAUSES_TO_TABS_COMMAND, "-h" });
+    mainService.run(new String[] { PausesToTabsCommand.COMMAND, "-h" });
     verify(pausesConverter, never()).pausesToTabs(any());
   }
 
   @Test
   public void run_SgdGeneToTss() throws Throwable {
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
   }
 
@@ -381,7 +379,7 @@ public class MainServiceTest {
   public void run_SgdGeneToTss_Input() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Files.createFile(input);
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-i", input.toString() });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "-i", input.toString() });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
     assertEquals(input, sgdGeneToTssCommandCaptor.getValue().input);
   }
@@ -390,7 +388,7 @@ public class MainServiceTest {
   public void run_SgdGeneToTss_InputLongName() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Files.createFile(input);
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "--input", input.toString() });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "--input", input.toString() });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
     assertEquals(input, sgdGeneToTssCommandCaptor.getValue().input);
   }
@@ -398,7 +396,7 @@ public class MainServiceTest {
   @Test
   public void run_SgdGeneToTss_InputNotExists() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-i", input.toString() });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "-i", input.toString() });
     verify(sgdGeneConverter, never()).sgdGeneToTss(any());
   }
 
@@ -406,7 +404,7 @@ public class MainServiceTest {
   public void run_SgdGeneToTss_Output() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Files.createFile(output);
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-o", output.toString() });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "-o", output.toString() });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
     assertEquals(output, sgdGeneToTssCommandCaptor.getValue().output);
   }
@@ -415,7 +413,7 @@ public class MainServiceTest {
   public void run_SgdGeneToTss_OutputLongName() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Files.createFile(output);
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "--output", output.toString() });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "--output", output.toString() });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
     assertEquals(output, sgdGeneToTssCommandCaptor.getValue().output);
   }
@@ -423,20 +421,20 @@ public class MainServiceTest {
   @Test
   public void run_SgdGeneToTss_OutputNotExists() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-o", output.toString() });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "-o", output.toString() });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
     assertEquals(output, sgdGeneToTssCommandCaptor.getValue().output);
   }
 
   @Test
   public void run_SgdGeneToTss_Help() throws Throwable {
-    mainService.run(new String[] { SGD_GENE_TO_TSS_COMMAND, "-h" });
+    mainService.run(new String[] { SgdGeneToTssCommand.COMMAND, "-h" });
     verify(sgdGeneConverter, never()).sgdGeneToTss(any());
   }
 
   @Test
   public void run_FakeGene() throws Throwable {
-    mainService.run(new String[] { FAKE_GENE_COMMAND });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
   }
 
@@ -444,7 +442,7 @@ public class MainServiceTest {
   public void run_FakeGene_Input() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Files.createFile(input);
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "-i", input.toString() });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-i", input.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(input, fakeGeneCommandCaptor.getValue().input);
   }
@@ -453,7 +451,7 @@ public class MainServiceTest {
   public void run_FakeGene_InputLongName() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     Files.createFile(input);
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "--input", input.toString() });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "--input", input.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(input, fakeGeneCommandCaptor.getValue().input);
   }
@@ -461,7 +459,7 @@ public class MainServiceTest {
   @Test
   public void run_FakeGene_InputNotExists() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "-i", input.toString() });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-i", input.toString() });
     verify(sgdGeneConverter, never()).sgdGeneToTss(any());
   }
 
@@ -469,7 +467,7 @@ public class MainServiceTest {
   public void run_FakeGene_Output() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Files.createFile(output);
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "-o", output.toString() });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-o", output.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(output, fakeGeneCommandCaptor.getValue().output);
   }
@@ -478,7 +476,7 @@ public class MainServiceTest {
   public void run_FakeGene_OutputLongName() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
     Files.createFile(output);
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "--output", output.toString() });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "--output", output.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(output, fakeGeneCommandCaptor.getValue().output);
   }
@@ -486,14 +484,14 @@ public class MainServiceTest {
   @Test
   public void run_FakeGene_OutputNotExists() throws Throwable {
     Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "-o", output.toString() });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-o", output.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(output, fakeGeneCommandCaptor.getValue().output);
   }
 
   @Test
   public void run_FakeGene_Help() throws Throwable {
-    mainService.run(new String[] { FAKE_GENE_COMMAND, "-h" });
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-h" });
     verify(fakeGene, never()).fakeGene(any());
   }
 

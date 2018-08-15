@@ -36,10 +36,10 @@ import java.nio.file.Path;
  */
 @Parameters(
     separators = " =",
-    commandNames = BedToTrackCommand.BED_TO_TRACK_COMMAND,
+    commandNames = BedToTrackCommand.COMMAND,
     commandDescription = "Converts BED file to track file")
 public class BedToTrackCommand {
-  public static final String BED_TO_TRACK_COMMAND = "bed2track";
+  public static final String COMMAND = "bed2track";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)

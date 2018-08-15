@@ -36,10 +36,10 @@ import java.nio.file.Path;
  */
 @Parameters(
     separators = " =",
-    commandNames = FakeGeneCommand.FAKE_GENE_COMMAND,
+    commandNames = FakeGeneCommand.COMMAND,
     commandDescription = "Generates a fake gene file covering all chromosomes")
 public class FakeGeneCommand {
-  public static final String FAKE_GENE_COMMAND = "fakegene";
+  public static final String COMMAND = "fakegene";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)

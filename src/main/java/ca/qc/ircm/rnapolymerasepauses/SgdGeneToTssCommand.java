@@ -36,10 +36,10 @@ import java.nio.file.Path;
  */
 @Parameters(
     separators = " =",
-    commandNames = SgdGeneToTssCommand.SGD_GENE_TO_TSS_COMMAND,
+    commandNames = SgdGeneToTssCommand.COMMAND,
     commandDescription = "Converts SGD gene file from UCSC to TSS file")
 public class SgdGeneToTssCommand {
-  public static final String SGD_GENE_TO_TSS_COMMAND = "sgdgene2tss";
+  public static final String COMMAND = "sgdgene2tss";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)

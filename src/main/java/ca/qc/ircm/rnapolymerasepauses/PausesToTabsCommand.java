@@ -36,10 +36,10 @@ import java.nio.file.Path;
  */
 @Parameters(
     separators = " =",
-    commandNames = PausesToTabsCommand.PAUSES_TO_TABS_COMMAND,
+    commandNames = PausesToTabsCommand.COMMAND,
     commandDescription = "Converts pauses file to tab delimited file")
 public class PausesToTabsCommand {
-  public static final String PAUSES_TO_TABS_COMMAND = "pauses2tabs";
+  public static final String COMMAND = "pauses2tabs";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)

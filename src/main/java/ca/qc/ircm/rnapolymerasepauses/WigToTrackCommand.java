@@ -36,10 +36,10 @@ import java.nio.file.Path;
  */
 @Parameters(
     separators = " =",
-    commandNames = WigToTrackCommand.WIG_TO_TRACK_COMMAND,
+    commandNames = WigToTrackCommand.COMMAND,
     commandDescription = "Converts WIG file to track file")
 public class WigToTrackCommand {
-  public static final String WIG_TO_TRACK_COMMAND = "wig2track";
+  public static final String COMMAND = "wig2track";
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Parameter(names = { "-h", "-help", "--h", "--help" }, description = "Show help", help = true)
