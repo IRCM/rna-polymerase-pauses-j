@@ -20,6 +20,7 @@ package ca.qc.ircm.rnapolymerasepauses.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import ca.qc.ircm.rnapolymerasepauses.test.config.NonTransactionalTestAnnotations;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,7 +33,11 @@ import java.util.stream.IntStream;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@NonTransactionalTestAnnotations
 public class ChromosomeSizesParserTest {
   private static final int CHROMOSOME_COUNT = 21;
   private static final int MAX_CHROMOSOME_LENGTH = 1000000;
