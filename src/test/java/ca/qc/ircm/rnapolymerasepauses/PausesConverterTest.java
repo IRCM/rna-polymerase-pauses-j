@@ -255,41 +255,14 @@ public class PausesConverterTest {
     for (int i = 0; i < pauses.size(); i++) {
       Pause pause = pauses.get(i);
       String[] columns = lines[i].split(SEPARATOR, -1);
-      assertEquals(6, columns.length);
+      assertEquals(7, columns.length);
       assertEquals(pause.name, columns[0]);
       assertEquals(pause.chromosome, columns[1]);
       assertEquals(pause.position, Integer.parseInt(columns[2]));
       assertEquals(pause.normalizedReads, Double.parseDouble(columns[3]), DELTA);
       assertEquals(pause.foldsAboveAverage, Double.parseDouble(columns[4]), DELTA);
       assertEquals(pause.beginningReads, Double.parseDouble(columns[5]), DELTA);
-    }
-  }
-
-  @Test
-  public void pausesToTabs_NoReads() throws Throwable {
-    pauses.forEach(pause -> {
-      pause.normalizedReads = null;
-      pause.beginningReads = null;
-    });
-    StringWriter contentAsWriter = new StringWriter();
-    writePauses(pauses, contentAsWriter);
-    content = contentAsWriter.toString();
-    when(tabsParameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
-    StringWriter writer = new StringWriter();
-    when(tabsParameters.writer()).thenReturn(new BufferedWriter(writer));
-
-    pausesConverter.pausesToTabs(tabsParameters);
-
-    String[] lines = writer.toString().split(LINE_SEPARATOR);
-    for (int i = 0; i < pauses.size(); i++) {
-      Pause pause = pauses.get(i);
-      String[] columns = lines[i].split(SEPARATOR, -1);
-      assertEquals(5, columns.length);
-      assertEquals(pause.name, columns[0]);
-      assertEquals(pause.chromosome, columns[1]);
-      assertEquals(pause.position, Integer.parseInt(columns[2]));
-      assertEquals(pause.foldsAboveAverage, Double.parseDouble(columns[3]), DELTA);
-      assertEquals(pause.sequence, columns[4]);
+      assertEquals("", columns[6]);
     }
   }
 

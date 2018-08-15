@@ -17,6 +17,7 @@
 
 package ca.qc.ircm.rnapolymerasepauses;
 
+import ca.qc.ircm.rnapolymerasepauses.io.PauseReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -36,8 +37,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class PausesConverter {
   private static final String LINE_SEPARATOR = "\n";
-  private static final String SEQUENCE_NAME_SEPARATOR = "_";
-  private static final String SEQUENCE_NAME_MARKER = ">";
   private static final String SEPARATOR = "\t";
   private static final Logger logger = LoggerFactory.getLogger(PausesConverter.class);
 
@@ -55,32 +54,26 @@ public class PausesConverter {
   public void pausesToBed(PausesToBedCommand parameters) throws IOException {
     Map<String, Gene> genes = parseTss(parameters.tss).stream()
         .collect(Collectors.toMap(gene -> gene.name, gene -> gene));
-    try (BufferedReader reader = parameters.reader(); BufferedWriter writer = parameters.writer()) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (line.startsWith(SEQUENCE_NAME_MARKER)) {
-          String[] columns =
-              line.substring(SEQUENCE_NAME_MARKER.length()).split(SEQUENCE_NAME_SEPARATOR, -1);
-          if (columns.length > 0) {
-            String name = columns[0];
-            Gene gene = genes.get(name);
-            if (gene == null) {
-              logger.warn("Gene {} could not be found in TSS file", name);
-            } else {
-              writer.write(columns[1]);
-              writer.write(SEPARATOR);
-              long distance = Long.parseLong(columns[2]);
-              long start = gene.start + distance;
-              writer.write(String.valueOf(start));
-              writer.write(SEPARATOR);
-              writer.write(String.valueOf(start + 1));
-              writer.write(SEPARATOR);
-              writer.write(name);
-              writer.write(SEPARATOR);
-              writer.write(columns[4]);
-              writer.write(LINE_SEPARATOR);
-            }
-          }
+    try (PauseReader reader = new PauseReader(parameters.reader());
+        BufferedWriter writer = parameters.writer()) {
+      Pause pause;
+      while ((pause = reader.readPause()) != null) {
+        Gene gene = genes.get(pause.name);
+        if (gene == null) {
+          logger.warn("Gene {} could not be found in TSS file", pause.name);
+        } else {
+          writer.write(pause.chromosome);
+          writer.write(SEPARATOR);
+          long distance = pause.position;
+          long start = gene.start + distance;
+          writer.write(String.valueOf(start));
+          writer.write(SEPARATOR);
+          writer.write(String.valueOf(start + 1));
+          writer.write(SEPARATOR);
+          writer.write(pause.name);
+          writer.write(SEPARATOR);
+          writer.write(String.valueOf(pause.foldsAboveAverage));
+          writer.write(LINE_SEPARATOR);
         }
       }
     }
@@ -110,37 +103,24 @@ public class PausesConverter {
    *           could not read pauses file or write to output
    */
   public void pausesToTabs(PausesToTabsCommand parameters) throws IOException {
-    try (BufferedReader reader = parameters.reader(); BufferedWriter writer = parameters.writer()) {
-      boolean first = true;
-      String line;
-      StringBuilder sequence = new StringBuilder();
-      while ((line = reader.readLine()) != null) {
-        if (line.startsWith(SEQUENCE_NAME_MARKER)) {
-          if (!first && sequence.length() > 0) {
-            writer.write(SEPARATOR);
-            writer.write(sequence.toString());
-          }
-          sequence.setLength(0);
-          if (!first) {
-            writer.write(LINE_SEPARATOR);
-          }
-          first = false;
-          String[] columns =
-              line.substring(SEQUENCE_NAME_MARKER.length()).split(SEQUENCE_NAME_SEPARATOR, -1);
-          if (columns.length > 0) {
-            writer.write(columns[0]);
-            for (int i = 1; i < columns.length; i++) {
-              writer.write(SEPARATOR);
-              writer.write(columns[i]);
-            }
-          }
-        } else {
-          sequence.append(line);
-        }
-      }
-      if (!first && sequence.length() > 0) {
+    try (PauseReader reader = new PauseReader(parameters.reader());
+        BufferedWriter writer = parameters.writer()) {
+      Pause pause;
+      while ((pause = reader.readPause()) != null) {
+        writer.write(pause.name);
         writer.write(SEPARATOR);
-        writer.write(sequence.toString());
+        writer.write(pause.chromosome);
+        writer.write(SEPARATOR);
+        writer.write(String.valueOf(pause.position));
+        writer.write(SEPARATOR);
+        writer.write(String.valueOf(pause.normalizedReads));
+        writer.write(SEPARATOR);
+        writer.write(String.valueOf(pause.foldsAboveAverage));
+        writer.write(SEPARATOR);
+        writer.write(String.valueOf(pause.beginningReads));
+        writer.write(SEPARATOR);
+        writer.write(String.valueOf(pause.sequence));
+        writer.write(LINE_SEPARATOR);
       }
     }
   }
