@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @NonTransactionalTestAnnotations
 public class MaximaTest {
   private static final String LINE_SEPARATOR = "\n";
-  private static final int PAUSES_GROUP_COUNT = 100;
+  private static final int PAUSES_GROUP_COUNT = 10000;
   private static final int PAUSE_NAME_LENGHT = 10;
   private static final int MAX_CHROMOSOME = 18;
   private static final String MARKER = ">";
@@ -74,17 +74,24 @@ public class MaximaTest {
     for (int i = 0; i < PAUSES_GROUP_COUNT; i++) {
       String gene = RandomStringUtils.randomAlphanumeric(PAUSE_NAME_LENGHT);
       int chromosome = random.nextInt(MAX_CHROMOSOME) + 1;
-      List<Pause> group = generatePausesGroup(gene, chromosome, 0, window);
-      pauses.addAll(group);
-      double max = group.stream().mapToDouble(pause -> pause.foldsAboveAverage).max().getAsDouble();
-      maximaPauses
-          .add(group.stream().filter(pause -> pause.foldsAboveAverage == max).findFirst().get());
-      group = generatePausesGroup(gene, chromosome, window * 3, window);
-      pauses.addAll(group);
-      double max2 =
-          group.stream().mapToDouble(pause -> pause.foldsAboveAverage).max().getAsDouble();
-      maximaPauses
-          .add(group.stream().filter(pause -> pause.foldsAboveAverage == max2).findFirst().get());
+      if (random.nextBoolean()) {
+        List<Pause> group = generatePausesGroup(gene, chromosome, 0, window);
+        pauses.addAll(group);
+        double max =
+            group.stream().mapToDouble(pause -> pause.foldsAboveAverage).max().getAsDouble();
+        maximaPauses
+            .add(group.stream().filter(pause -> pause.foldsAboveAverage == max).findFirst().get());
+        group = generatePausesGroup(gene, chromosome, window * 3, window);
+        pauses.addAll(group);
+        double max2 =
+            group.stream().mapToDouble(pause -> pause.foldsAboveAverage).max().getAsDouble();
+        maximaPauses
+            .add(group.stream().filter(pause -> pause.foldsAboveAverage == max2).findFirst().get());
+      } else {
+        List<Pause> group = generatePausesGroup(gene, chromosome, 0, 1);
+        pauses.addAll(group);
+        maximaPauses.addAll(group);
+      }
     }
   }
 
