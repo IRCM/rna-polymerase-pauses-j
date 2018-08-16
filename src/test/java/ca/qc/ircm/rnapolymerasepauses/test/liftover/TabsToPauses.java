@@ -27,6 +27,7 @@ public class TabsToPauses {
         String line;
         while ((line = reader.readLine()) != null) {
           String[] columns = line.split("\t");
+          writer.write(">");
           writer.write(columns[0]);
           for (int i = 1; i < columns.length - 1; i++) {
             writer.write("_");
