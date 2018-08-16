@@ -83,6 +83,7 @@ public class PausesConverter {
     List<Gene> genes = new ArrayList<>();
     try (BufferedReader reader = Files.newBufferedReader(tss)) {
       String line;
+      reader.readLine(); // Skip header.
       while ((line = reader.readLine()) != null) {
         String[] columns = line.split(SEPARATOR, -1);
         Gene gene = new Gene();
