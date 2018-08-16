@@ -44,7 +44,6 @@ public class Maxima {
       String gene = null;
       List<Pause> pauses = new ArrayList<>();
       Pause pause;
-      boolean first = true;
       while ((pause = reader.readPause()) != null) {
         if (gene == null) {
           gene = pause.name;
@@ -52,11 +51,6 @@ public class Maxima {
         if (pause.name.equals(gene)) {
           pauses.add(pause);
         } else {
-          if (first) {
-            first = false;
-            System.out.println(pauses);
-            System.out.println(maxima(pauses, parameters.windowSize));
-          }
           pauses = maxima(pauses, parameters.windowSize);
           for (Pause pa : pauses) {
             writer.writePause(pa);
