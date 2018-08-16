@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.springframework.stereotype.Component;
 
 /**
  * Keeps only best pause inside a window.
  */
+@Component
 public class Maxima {
   /**
    * Keeps only best pause inside a window.

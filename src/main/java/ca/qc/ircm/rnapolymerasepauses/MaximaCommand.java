@@ -18,6 +18,7 @@
 package ca.qc.ircm.rnapolymerasepauses;
 
 import ca.qc.ircm.rnapolymerasepauses.validation.FileExistsValidation;
+import ca.qc.ircm.rnapolymerasepauses.validation.WindowValidation;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.converters.PathConverter;
@@ -50,7 +51,11 @@ public class MaximaCommand {
       converter = PathConverter.class,
       validateWith = FileExistsValidation.class)
   public Path input;
-  @Parameter(names = { "-w", "--window" }, description = "Window size", required = true)
+  @Parameter(
+      names = { "-w", "--window" },
+      description = "Window size",
+      required = true,
+      validateWith = WindowValidation.class)
   public int windowSize;
   @Parameter(
       names = { "-o", "--output" },
