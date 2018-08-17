@@ -46,7 +46,8 @@ public class MaximaCommand {
   public boolean help = false;
   @Parameter(
       names = { "-i", "--input" },
-      description = "Input file. Pauses must be grouped by genes. Defaults to system input for piping",
+      description = "Input file. Pauses must be grouped by genes. "
+          + "Defaults to system input for piping",
       converter = PathConverter.class,
       validateWith = FileExistsValidation.class)
   public Path input;

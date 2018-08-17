@@ -41,6 +41,13 @@ public class PauseReader implements Closeable {
     this.reader = reader;
   }
 
+  /**
+   * Reads next pause.
+   * 
+   * @return returns next pause found in reader
+   * @throws IOException
+   *           could not read reader
+   */
   public Pause readPause() throws IOException {
     if (line == null) {
       line = reader.readLine();

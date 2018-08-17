@@ -47,6 +47,14 @@ public class PauseWriter implements Closeable {
     this.writer = writer;
   }
 
+  /**
+   * Writes pause in writer.
+   *
+   * @param pause
+   *          pause
+   * @throws IOException
+   *           could not write to writer
+   */
   public void writePause(Pause pause) throws IOException {
     writer.write(MARKER);
     writer.write(pause.name);
