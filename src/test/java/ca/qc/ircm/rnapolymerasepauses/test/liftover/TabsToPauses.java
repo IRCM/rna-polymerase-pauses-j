@@ -11,7 +11,19 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Converts pauses in tabs format to Churchman pauses format.
+ */
 public class TabsToPauses {
+
+  /**
+   * Converts pauses in tabs format to Churchman pauses format.
+   * 
+   * @param args
+   *          not used
+   * @throws IOException
+   *           could not read or write a pause file
+   */
   public static void main(String[] args) throws IOException {
     Path home = Paths.get(System.getProperty("user.home")).resolve("Downloads");
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("regex:.*/(WT|Y1F).*\\.txt");
