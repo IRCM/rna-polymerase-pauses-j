@@ -40,6 +40,8 @@ public class MainService implements CommandLineRunner {
   @Inject
   private PausesConverter pausesConverter;
   @Inject
+  private Maxima maxima;
+  @Inject
   private SgdGeneConverter sgdGeneConverter;
   @Inject
   private FakeGene fakeGene;
@@ -50,11 +52,12 @@ public class MainService implements CommandLineRunner {
   }
 
   protected MainService(BedConverter bedConverter, WigConverter wigConverter,
-      PausesConverter pausesConverter, SgdGeneConverter sgdGeneConverter, FakeGene fakeGene,
-      boolean runnerEnabled) {
+      PausesConverter pausesConverter, Maxima maxima, SgdGeneConverter sgdGeneConverter,
+      FakeGene fakeGene, boolean runnerEnabled) {
     this.bedConverter = bedConverter;
     this.wigConverter = wigConverter;
     this.pausesConverter = pausesConverter;
+    this.maxima = maxima;
     this.sgdGeneConverter = sgdGeneConverter;
     this.fakeGene = fakeGene;
     this.runnerEnabled = runnerEnabled;
@@ -77,12 +80,13 @@ public class MainService implements CommandLineRunner {
     WigToTrackCommand wigToTrackCommand = new WigToTrackCommand();
     PausesToBedCommand pausesToBedCommand = new PausesToBedCommand();
     PausesToTabsCommand pausesToTabsCommand = new PausesToTabsCommand();
+    MaximaCommand maximaCommand = new MaximaCommand();
     SgdGeneToTssCommand sgdGeneToTssCommand = new SgdGeneToTssCommand();
     FakeGeneCommand fakeGeneCommand = new FakeGeneCommand();
     JCommander command = JCommander.newBuilder().addObject(mainCommand)
         .addCommand(bedToTrackCommand).addCommand(wigToTrackCommand).addCommand(pausesToBedCommand)
-        .addCommand(pausesToTabsCommand).addCommand(sgdGeneToTssCommand).addCommand(fakeGeneCommand)
-        .build();
+        .addCommand(pausesToTabsCommand).addCommand(maximaCommand).addCommand(sgdGeneToTssCommand)
+        .addCommand(fakeGeneCommand).build();
     command.setCaseSensitiveOptions(false);
     try {
       command.parse(args);
@@ -111,6 +115,12 @@ public class MainService implements CommandLineRunner {
           command.usage(PausesToTabsCommand.COMMAND);
         } else {
           pausesToTabs(pausesToTabsCommand);
+        }
+      } else if (command.getParsedCommand().equals(MaximaCommand.COMMAND)) {
+        if (maximaCommand.help) {
+          command.usage(MaximaCommand.COMMAND);
+        } else {
+          maxima(maximaCommand);
         }
       } else if (command.getParsedCommand().equals(SgdGeneToTssCommand.COMMAND)) {
         if (sgdGeneToTssCommand.help) {
@@ -174,6 +184,19 @@ public class MainService implements CommandLineRunner {
     logger.debug("Converts pauses to tab delimited");
     try {
       pausesConverter.pausesToTabs(command);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not parse pauses file");
+      e.printStackTrace();
+    } catch (IOException e) {
+      System.err.println("Could not read input or write to output");
+      e.printStackTrace();
+    }
+  }
+
+  private void maxima(MaximaCommand command) {
+    logger.debug("Find pauses maximas");
+    try {
+      maxima.maxima(command);
     } catch (NumberFormatException e) {
       System.err.println("Could not parse pauses file");
       e.printStackTrace();

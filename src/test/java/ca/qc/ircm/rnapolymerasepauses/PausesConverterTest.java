@@ -146,6 +146,16 @@ public class PausesConverterTest {
   }
 
   private void writeGenes(Iterable<Gene> genes, Writer output) throws IOException {
+    output.write("SEQ_NAME");
+    output.write(SEPARATOR);
+    output.write("START");
+    output.write(SEPARATOR);
+    output.write("END");
+    output.write(SEPARATOR);
+    output.write("STRAND");
+    output.write(SEPARATOR);
+    output.write("ANNO_TAG");
+    output.write(LINE_SEPARATOR);
     for (Gene gene : genes) {
       output.write(gene.chromosome);
       output.write(SEPARATOR);

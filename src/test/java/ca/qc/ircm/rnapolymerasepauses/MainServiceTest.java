@@ -48,6 +48,8 @@ public class MainServiceTest {
   @Mock
   private PausesConverter pausesConverter;
   @Mock
+  private Maxima maxima;
+  @Mock
   private SgdGeneConverter sgdGeneConverter;
   @Mock
   private FakeGene fakeGene;
@@ -60,6 +62,8 @@ public class MainServiceTest {
   @Captor
   private ArgumentCaptor<PausesToTabsCommand> pausesToTabsCommandCaptor;
   @Captor
+  private ArgumentCaptor<MaximaCommand> maximaCommandCaptor;
+  @Captor
   private ArgumentCaptor<SgdGeneToTssCommand> sgdGeneToTssCommandCaptor;
   @Captor
   private ArgumentCaptor<FakeGeneCommand> fakeGeneCommandCaptor;
@@ -68,18 +72,19 @@ public class MainServiceTest {
 
   @Before
   public void beforeTest() {
-    mainService = new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter,
-        fakeGene, true);
+    mainService = new MainService(bedConverter, wigConverter, pausesConverter, maxima,
+        sgdGeneConverter, fakeGene, true);
   }
 
   @Test
   public void run_RunnerDisabled() {
-    mainService = new MainService(bedConverter, wigConverter, pausesConverter, sgdGeneConverter,
-        fakeGene, false);
+    mainService = new MainService(bedConverter, wigConverter, pausesConverter, maxima,
+        sgdGeneConverter, fakeGene, false);
     mainService.run(new String[] { COMMAND, "-s", "1" });
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+    verifyZeroInteractions(maxima);
     verifyZeroInteractions(sgdGeneConverter);
     verifyZeroInteractions(fakeGene);
   }
@@ -90,6 +95,7 @@ public class MainServiceTest {
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+    verifyZeroInteractions(maxima);
     verifyZeroInteractions(sgdGeneConverter);
     verifyZeroInteractions(fakeGene);
   }
@@ -493,6 +499,114 @@ public class MainServiceTest {
   }
 
   @Test
+  public void run_Maxima() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-w", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_WindowMissing() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
+  public void run_Maxima_WindowLongName() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "--window", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_WindowBelowMinimum() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-w", "0" });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
+  public void run_Maxima_NegativeWindow() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-w", "-1" });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
+  public void run_Maxima_InvalidWindow() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-w", "a" });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
+  public void run_Maxima_DoubleWindow() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-w", "1.2" });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
+  public void run_Maxima_Input() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-i", input.toString(), "-w", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(input, maximaCommandCaptor.getValue().input);
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_InputLongName() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    Files.createFile(input);
+    mainService
+        .run(new String[] { MaximaCommand.COMMAND, "--input", input.toString(), "-w", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(input, maximaCommandCaptor.getValue().input);
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_InputNotExists() throws Throwable {
+    Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-i", input.toString(), "-w", "20" });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
+  public void run_Maxima_Output() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-o", output.toString(), "-w", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(output, maximaCommandCaptor.getValue().output);
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_OutputLongName() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    Files.createFile(output);
+    mainService
+        .run(new String[] { MaximaCommand.COMMAND, "--output", output.toString(), "-w", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(output, maximaCommandCaptor.getValue().output);
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_OutputNotExists() throws Throwable {
+    Path output = temporaryFolder.getRoot().toPath().resolve("output.txt");
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-o", output.toString(), "-w", "20" });
+    verify(maxima).maxima(maximaCommandCaptor.capture());
+    assertEquals(output, maximaCommandCaptor.getValue().output);
+    assertEquals(20, maximaCommandCaptor.getValue().windowSize);
+  }
+
+  @Test
+  public void run_Maxima_Help() throws Throwable {
+    mainService.run(new String[] { MaximaCommand.COMMAND, "-h" });
+    verify(maxima, never()).maxima(any());
+  }
+
+  @Test
   public void run_SgdGeneToTss() throws Throwable {
     mainService.run(new String[] { SgdGeneToTssCommand.COMMAND });
     verify(sgdGeneConverter).sgdGeneToTss(sgdGeneToTssCommandCaptor.capture());
@@ -624,6 +738,7 @@ public class MainServiceTest {
     verifyZeroInteractions(bedConverter);
     verifyZeroInteractions(wigConverter);
     verifyZeroInteractions(pausesConverter);
+    verifyZeroInteractions(maxima);
     verifyZeroInteractions(sgdGeneConverter);
     verifyZeroInteractions(fakeGene);
   }
