@@ -76,7 +76,7 @@ public class FakeGeneTest {
     content = builder.toString();
   }
 
-  private void assertGeneContent(String trackContent) {
+  private void assertGeneContent(String trackContent, int padding) {
     String[] lines = trackContent.split(LINE_SEPARATOR);
     int lineNumber = 0;
     for (Map.Entry<String, Long> entry : sizes.entrySet()) {
@@ -88,24 +88,24 @@ public class FakeGeneTest {
       assertEquals(chromosome + "-P", columns[1]);
       assertEquals(chromosome, columns[2]);
       assertEquals("+", columns[3]);
-      assertEquals("2", columns[4]);
-      assertEquals(String.valueOf(size - 2), columns[5]);
-      assertEquals("2", columns[6]);
-      assertEquals(String.valueOf(size - 2), columns[7]);
-      assertEquals("2,", columns[8]);
-      assertEquals((size - 2) + ",", columns[9]);
+      assertEquals(String.valueOf(padding), columns[4]);
+      assertEquals(String.valueOf(size - padding), columns[5]);
+      assertEquals(String.valueOf(padding), columns[6]);
+      assertEquals(String.valueOf(size - padding), columns[7]);
+      assertEquals(padding + ",", columns[8]);
+      assertEquals((size - padding) + ",", columns[9]);
       String minusGene = lines[lineNumber++];
       columns = minusGene.split("\t", -1);
       assertEquals(indexValue, columns[0]);
       assertEquals(chromosome + "-M", columns[1]);
       assertEquals(chromosome, columns[2]);
       assertEquals("-", columns[3]);
-      assertEquals("2", columns[4]);
-      assertEquals(String.valueOf(size - 2), columns[5]);
-      assertEquals("2", columns[6]);
-      assertEquals(String.valueOf(size - 2), columns[7]);
-      assertEquals("2,", columns[8]);
-      assertEquals((size - 2) + ",", columns[9]);
+      assertEquals(String.valueOf(padding), columns[4]);
+      assertEquals(String.valueOf(size - padding), columns[5]);
+      assertEquals(String.valueOf(padding), columns[6]);
+      assertEquals(String.valueOf(size - padding), columns[7]);
+      assertEquals(padding + ",", columns[8]);
+      assertEquals((size - padding) + ",", columns[9]);
     }
   }
 
@@ -114,9 +114,22 @@ public class FakeGeneTest {
     when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
     StringWriter writer = new StringWriter();
     when(parameters.writer()).thenReturn(new BufferedWriter(writer));
+    parameters.padding = 2;
 
     fakeGene.fakeGene(parameters);
 
-    assertGeneContent(writer.toString());
+    assertGeneContent(writer.toString(), 2);
+  }
+
+  @Test
+  public void fakeGene_Padding() throws Throwable {
+    when(parameters.reader()).thenReturn(new BufferedReader(new StringReader(content)));
+    StringWriter writer = new StringWriter();
+    when(parameters.writer()).thenReturn(new BufferedWriter(writer));
+    parameters.padding = 10;
+
+    fakeGene.fakeGene(parameters);
+
+    assertGeneContent(writer.toString(), 10);
   }
 }

@@ -21,6 +21,7 @@ import ca.qc.ircm.rnapolymerasepauses.validation.FileExistsValidation;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.converters.PathConverter;
+import com.beust.jcommander.validators.PositiveInteger;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -50,6 +51,11 @@ public class FakeGeneCommand {
       converter = PathConverter.class,
       validateWith = FileExistsValidation.class)
   public Path input;
+  @Parameter(
+      names = { "-p", "--padding" },
+      description = "Space between chromosome start and gene start. Defaults to 2.",
+      validateWith = PositiveInteger.class)
+  public int padding = 2;
   @Parameter(
       names = { "-o", "--output" },
       description = "Output file. Defaults to system output for piping",

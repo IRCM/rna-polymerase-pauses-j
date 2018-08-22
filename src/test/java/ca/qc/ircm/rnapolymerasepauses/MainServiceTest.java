@@ -673,6 +673,40 @@ public class MainServiceTest {
   public void run_FakeGene() throws Throwable {
     mainService.run(new String[] { FakeGeneCommand.COMMAND });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(2, fakeGeneCommandCaptor.getValue().padding);
+  }
+
+  @Test
+  public void run_FakeGene_Padding() throws Throwable {
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-p", "10" });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(10, fakeGeneCommandCaptor.getValue().padding);
+  }
+
+  @Test
+  public void run_FakeGene_PaddingLongName() throws Throwable {
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "--padding", "10" });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(10, fakeGeneCommandCaptor.getValue().padding);
+  }
+
+  @Test
+  public void run_FakeGene_PaddingZero() throws Throwable {
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-p", "0" });
+    verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
+    assertEquals(0, fakeGeneCommandCaptor.getValue().padding);
+  }
+
+  @Test
+  public void run_FakeGene_PaddingNegative() throws Throwable {
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-p", "-2" });
+    verify(fakeGene, never()).fakeGene(any());
+  }
+
+  @Test
+  public void run_FakeGene_PaddingInvalid() throws Throwable {
+    mainService.run(new String[] { FakeGeneCommand.COMMAND, "-p", "a" });
+    verify(fakeGene, never()).fakeGene(any());
   }
 
   @Test
@@ -682,6 +716,7 @@ public class MainServiceTest {
     mainService.run(new String[] { FakeGeneCommand.COMMAND, "-i", input.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(input, fakeGeneCommandCaptor.getValue().input);
+    assertEquals(2, fakeGeneCommandCaptor.getValue().padding);
   }
 
   @Test
@@ -691,13 +726,14 @@ public class MainServiceTest {
     mainService.run(new String[] { FakeGeneCommand.COMMAND, "--input", input.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(input, fakeGeneCommandCaptor.getValue().input);
+    assertEquals(2, fakeGeneCommandCaptor.getValue().padding);
   }
 
   @Test
   public void run_FakeGene_InputNotExists() throws Throwable {
     Path input = temporaryFolder.getRoot().toPath().resolve("input.txt");
     mainService.run(new String[] { FakeGeneCommand.COMMAND, "-i", input.toString() });
-    verify(sgdGeneConverter, never()).sgdGeneToTss(any());
+    verify(fakeGene, never()).fakeGene(any());
   }
 
   @Test
@@ -707,6 +743,7 @@ public class MainServiceTest {
     mainService.run(new String[] { FakeGeneCommand.COMMAND, "-o", output.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(output, fakeGeneCommandCaptor.getValue().output);
+    assertEquals(2, fakeGeneCommandCaptor.getValue().padding);
   }
 
   @Test
@@ -716,6 +753,7 @@ public class MainServiceTest {
     mainService.run(new String[] { FakeGeneCommand.COMMAND, "--output", output.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(output, fakeGeneCommandCaptor.getValue().output);
+    assertEquals(2, fakeGeneCommandCaptor.getValue().padding);
   }
 
   @Test
@@ -724,6 +762,7 @@ public class MainServiceTest {
     mainService.run(new String[] { FakeGeneCommand.COMMAND, "-o", output.toString() });
     verify(fakeGene).fakeGene(fakeGeneCommandCaptor.capture());
     assertEquals(output, fakeGeneCommandCaptor.getValue().output);
+    assertEquals(2, fakeGeneCommandCaptor.getValue().padding);
   }
 
   @Test

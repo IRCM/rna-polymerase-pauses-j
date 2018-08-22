@@ -56,13 +56,15 @@ public class FakeGene {
         if (columns.length < 2) {
           throw new IllegalStateException("chromosome sizes is invalid");
         }
-        writeFakeGene(writer, firstColumn, columns[0], Long.parseLong(columns[1]), true);
-        writeFakeGene(writer, firstColumn++, columns[0], Long.parseLong(columns[1]), false);
+        writeFakeGene(writer, firstColumn, columns[0], Long.parseLong(columns[1]),
+            parameters.padding, true);
+        writeFakeGene(writer, firstColumn++, columns[0], Long.parseLong(columns[1]),
+            parameters.padding, false);
       }
     }
   }
 
-  private void writeFakeGene(Writer writer, int index, String chromosome, long size,
+  private void writeFakeGene(Writer writer, int index, String chromosome, long size, int padding,
       boolean plusStrand) throws IOException {
     writer.write(String.valueOf(index));
     writer.write(COLUMN_SEPARATOR);
@@ -72,17 +74,17 @@ public class FakeGene {
     writer.write(COLUMN_SEPARATOR);
     writer.write(plusStrand ? PLUS_STRAND : MINUS_STRAND);
     writer.write(COLUMN_SEPARATOR);
-    writer.write("2");
+    writer.write(String.valueOf(padding));
     writer.write(COLUMN_SEPARATOR);
-    writer.write(String.valueOf(size - 2));
+    writer.write(String.valueOf(size - padding));
     writer.write(COLUMN_SEPARATOR);
-    writer.write("2");
+    writer.write(String.valueOf(padding));
     writer.write(COLUMN_SEPARATOR);
-    writer.write(String.valueOf(size - 2));
+    writer.write(String.valueOf(size - padding));
     writer.write(COLUMN_SEPARATOR);
-    writer.write("2,");
+    writer.write(padding + ",");
     writer.write(COLUMN_SEPARATOR);
-    writer.write((size - 2) + ",");
+    writer.write((size - padding) + ",");
     writer.write(COLUMN_SEPARATOR);
     writer.write(PROTEIN);
     writer.write(LINE_SEPARATOR);
