@@ -101,9 +101,9 @@ def main(argv=None):
     upstream=[seq[0] for seq in peakSeq]
     downstream=[seq[1] for seq in peakSeq]
    
-    percentA = float(len([seq for seq in upstream if seq[-1]=='A']))/len(upstream)*100
-    percentT = float(len([seq for seq in downstream if seq[0]=='T']))/len(upstream)*100
-    percentATC = float(len([seq for (i,seq) in enumerate(upstream) if (seq[-1]=='A' and downstream[i][:2]=='TC') ]))/len(upstream)*100
+    percentA = float(len([seq for seq in upstream if seq[-1]=='A']))/max(len(upstream)*100,1)
+    percentT = float(len([seq for seq in downstream if seq[0]=='T']))/max(len(upstream)*100,1)
+    percentATC = float(len([seq for (i,seq) in enumerate(upstream) if (seq[-1]=='A' and downstream[i][:2]=='TC') ]))/max(len(upstream)*100,1)
     print "Percent A is %s" % percentA
     print "Percent T is %s" % percentT
     print "Percent ATC is %s" % percentATC
