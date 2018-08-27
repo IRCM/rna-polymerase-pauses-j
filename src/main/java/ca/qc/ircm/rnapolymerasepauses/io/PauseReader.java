@@ -43,7 +43,7 @@ public class PauseReader implements Closeable {
 
   /**
    * Reads next pause.
-   * 
+   *
    * @return returns next pause found in reader
    * @throws IOException
    *           could not read reader
@@ -51,13 +51,13 @@ public class PauseReader implements Closeable {
   public Pause readPause() throws IOException {
     if (line == null) {
       line = reader.readLine();
-      if (line == null) {
-        return null;
-      }
     }
     while (line != null && !line.startsWith(MARKER)) {
       // Skip potential comments.
       line = reader.readLine();
+    }
+    if (line == null) {
+      return null;
     }
     String[] columns = line.substring(MARKER.length(), line.length()).split(SEPARATOR);
     Pause pause = new Pause();
