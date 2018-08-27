@@ -24,8 +24,8 @@
     <relativePath>../ircm-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>rna-polymerase-pauses</artifactId>
-  <name>rna-polymerase-pauses</name>
+  <artifactId>rna-polymerase-pauses-j</artifactId>
+  <name>rna-polymerase-pauses-j</name>
   <inceptionYear>2017</inceptionYear>
   <description>Tools to help finding RNA polymerase pause sites</description>
   <licenses>
@@ -36,14 +36,14 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git@github.com:IRCM/rna-polymerase-pauses.git</connection>
-    <developerConnection>scm:git:git@github.com:IRCM/rna-polymerase-pauses.git</developerConnection>
-    <url>https://github.com/IRCM/rna-polymerase-pauses</url>
+    <connection>scm:git:git@github.com:IRCM/rna-polymerase-pauses-j.git</connection>
+    <developerConnection>scm:git:git@github.com:IRCM/rna-polymerase-pauses-j.git</developerConnection>
+    <url>https://github.com/IRCM/rna-polymerase-pauses-j</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/IRCM/rna-polymerase-pauses/issues</url>
+    <url>https://github.com/IRCM/rna-polymerase-pauses-j/issues</url>
   </issueManagement>
   <properties>
     <javac.version>1.8</javac.version>
