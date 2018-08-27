@@ -26,6 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>rna-polymerase-pauses-j</artifactId>
   <name>rna-polymerase-pauses-j</name>
+  <version>2-SNAPSHOT</version>
   <inceptionYear>2017</inceptionYear>
   <description>Tools to help finding RNA polymerase pause sites</description>
   <licenses>
@@ -251,5 +252,4 @@
       </plugin>
     </plugins>
   </reporting>
-  <version>2-SNAPSHOT</version>
 </project>
